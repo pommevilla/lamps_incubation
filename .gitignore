@@ -45,6 +45,6 @@ vignettes/*.pdf
 # Snakemake files
 .snakemake/
 logs
-renv_restored.done
+.lamps_incubation_renv_restored
 
 

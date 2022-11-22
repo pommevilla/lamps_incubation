@@ -1,5 +1,5 @@
-name: Run Drought Index Workflow
-run-name: ${{ github.event.repository.updated_at}} run
+name: Run Snakemake and render site
+run-name: ${{ github.event.repository.updated_at }} run
 on: [push]
 jobs:
   Render-Site:

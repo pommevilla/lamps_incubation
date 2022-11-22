@@ -37,4 +37,11 @@ vignettes/*.pdf
 
 # R Environment Variables
 .Renviron
+
+# Apple files
 .DS_Store
+
+# Snakemake files
+.snakemake/
+
+

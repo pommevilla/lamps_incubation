@@ -28,6 +28,8 @@ rule generate_flux_and_amoa_abundance_plots:
         "figures/crop_plot.png",
         "figures/fert_plot_cumulative.png",
         "figures/fert_plot.png"
+    conda:
+        "environment.yml"
     shell:
         """
         {input.r_script}

@@ -1,11 +1,17 @@
+TREATMENTS = ["addition", "crop", "fert"]
+FLUX_PLOT_TYPES = ["", "_cumulative"]
+
 rule targets:
     input:
-        "figures/addition_plot_cumulative.png",
-        "figures/addition_plot.png",
-        "figures/crop_plot_cumulative.png",
-        "figures/crop_plot.png",
-        "figures/fert_plot_cumulative.png",
-        "figures/fert_plot.png",
+        # "figures/addition_plot_cumulative.png",
+        # "figures/addition_plot.png",
+        # "figures/crop_plot_cumulative.png",
+        # "figures/crop_plot.png",
+        # "figures/fert_plot_cumulative.png",
+        # "figures/fert_plot.png",
+        expand("figures/{treatment}_plot{plot_type}.png",
+            treatment = TREATMENTS, plot_type = FLUX_PLOT_TYPES
+        ),
         "figures/snakemake_dag.png",
         ".lamps_incubation_renv_restored"
 
@@ -42,12 +48,9 @@ rule generate_flux_and_amoa_abundance_plots:
         restored_env = ".lamps_incubation_renv_restored",
         r_script = "code/create_line_charts.R"
     output:
-        "figures/addition_plot_cumulative.png",
-        "figures/addition_plot.png",
-        "figures/crop_plot_cumulative.png",
-        "figures/crop_plot.png",
-        "figures/fert_plot_cumulative.png",
-        "figures/fert_plot.png"
+        expand("figures/{treatment}_plot{plot_type}.png",
+            treatment = TREATMENTS, plot_type = FLUX_PLOT_TYPES
+        )
     log:
         log = "logs/generate_flux_plots.txt"
     conda:

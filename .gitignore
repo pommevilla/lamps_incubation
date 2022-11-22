@@ -44,5 +44,6 @@ vignettes/*.pdf
 
 # Snakemake files
 .snakemake/
+logs
 
 

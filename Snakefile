@@ -1,14 +1,10 @@
+configfile: "config.yaml"
+
 TREATMENTS = ["addition", "crop", "fert"]
 FLUX_PLOT_TYPES = ["", "_cumulative"]
 
 rule targets:
     input:
-        # "figures/addition_plot_cumulative.png",
-        # "figures/addition_plot.png",
-        # "figures/crop_plot_cumulative.png",
-        # "figures/crop_plot.png",
-        # "figures/fert_plot_cumulative.png",
-        # "figures/fert_plot.png",
         expand("figures/{treatment}_plot{plot_type}.png",
             treatment = TREATMENTS, plot_type = FLUX_PLOT_TYPES
         ),

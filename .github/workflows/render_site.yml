@@ -1,0 +1,24 @@
+name: Run Drought Index Workflow
+run-name: ${{ github.event.repository.updated_at}} run
+on: [push]
+jobs:
+  Render-Site:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v3
+      - run: echo "💡 The ${{ github.repository }} repository has been cloned to the runner."
+      - name: Snakemake workflow
+        uses: snakemake/snakemake-github-action@v1
+        with:
+          directory: "."
+          snakefile: "Snakefile"
+          args: "--cores 3 --use-conda --conda-cleanup-pkgs cache"
+          stagein: ""
+      # - name: "Deploy to gh-pages"
+      #   uses: peaceiris/actions-gh-pages@v3
+      #   if: github.ref == 'refs/heads/main'
+      #   with:
+      #     github_token: ${{ secrets.GITHUB_TOKEN }}
+      #     publish_dir: ./docs
+      - run: echo "🍏 This job's status is ${{ job.status }}."

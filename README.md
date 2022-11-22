@@ -15,3 +15,13 @@ Then, activate the environment:
 ```
 conda activate lamps_incubation
 ```
+
+You can then run the pipeline with:
+
+```
+snakemake -c 1
+```
+
+_(You can also do `snakemake -c 2` or however many cores you'd like to use.)_
+
+This will restore the R environment, regenerate all the figures, and render the website.

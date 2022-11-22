@@ -1,9 +1,8 @@
 #!/usr/bin/env Rscript
-
 library(patchwork)
 library(MetBrewer)
 
-source("setup.R")
+source("code/setup.R")
 
 plot_amoas <- function(voi, palette, label, raw = FALSE) {
   amoa_dodge <- position_dodge(width = 0.1)

@@ -3,6 +3,14 @@ configfile: "config.yaml"
 TREATMENTS = ["addition", "crop", "fert"]
 FLUX_PLOT_TYPES = ["", "_cumulative"]
 
+rule testing_config:
+    output:
+        touch("testing_complete")
+    shell:
+        """
+        echo {config[QUARTO_VERSION]} > "testing_complete"
+        """
+
 rule targets:
     input:
         expand("figures/{treatment}_plot{plot_type}.png",

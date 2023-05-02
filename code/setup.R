@@ -1,6 +1,8 @@
 library(tidyverse)
 library(lubridate)
 library(janitor)
+library(MetBrewer)
+library(patchwork)
 
 theme_set(
   theme_light() +
@@ -14,7 +16,11 @@ nice_expansion <- expansion(add = 0, mult = c(0, 0.1))
 
 data.priming <- read.csv("data/priming_amoA_deltaCt.csv", header = T) %>%
   rename(sample_id = X) %>%
-  mutate(fert_level = as.factor(fert_level))
+  mutate(fert_level = as.factor(case_when(
+    fert_level == 0 ~ "0N",
+    fert_level == 336 ~ "336N",
+    TRUE ~ "112N"
+  ))) 
 
 data.raw <- read.csv("data/priming_amoA_rawCt.csv", header = T) %>%
   rename(sample_id = X) %>%
@@ -57,8 +63,8 @@ tgas <- read.csv("data/tgas1.csv")
 addition_colors <- met.brewer("Benedictus", 3)
 names(addition_colors) <- levels(data.priming$addition)
 
-fertilization_colors <- met.brewer("VanGogh3", 2)
-names(fertilization_colors) <- levels(data.priming$fert_level)
+fertilization_colors <- met.brewer("VanGogh3", 3, type = "continuous")
+names(fertilization_colors) <- c("0N", "112N", "336N")
 
 crop_colors <- met.brewer("Java", 2, direction = -1)
 names(crop_colors) <- levels(data.priming$crop)

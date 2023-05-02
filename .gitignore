@@ -47,4 +47,10 @@ vignettes/*.pdf
 logs
 .lamps_incubation_renv_restored
 
+# Ignoring large tiff files
+*.tiff
+
+# Specific workspace stuff
+.vscode/
+.lintr
 

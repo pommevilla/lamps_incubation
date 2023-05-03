@@ -53,4 +53,5 @@ logs
 # Specific workspace stuff
 .vscode/
 .lintr
+Rplots.pdf
 

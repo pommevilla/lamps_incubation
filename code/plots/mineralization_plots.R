@@ -13,7 +13,8 @@ mineralization_data <- read.csv(here("data/prepped_data", "mineralization_data.c
 
 ################## Plots
 # This function will take in a grouping variable, a palette, and a y variable
-# and plot that y variable against time.
+# and plot that y variable against time. The optional zero line is to add a horizontal
+# line at x = 0.
 plot_mineralization <- function(voi, palette, net_min_var, label, zero_line = FALSE) {
   this_dodge <- position_dodge(width = 0.1)
 
@@ -60,8 +61,6 @@ plot_mineralization <- function(voi, palette, net_min_var, label, zero_line = FA
 
   return(p)
 }
-
-
 
 # Plot of net mineralization against factors
 net_mineralization_plot <- plot_mineralization(crop, crop_colors, net_mineralization_1, label = "Crop") +
@@ -165,14 +164,6 @@ treatment_row_plots <- (plot_mineralization(treatment, fertilization_colors, no3
       )
   )
 
-plot_mineralization(addition, addition_colors, net_mineralization_1, label = "Addition", ) +
-  labs(
-    x = "",
-    y = "Net mineralization",
-  )
-
-
-
 # Combining the row plots together...
 crop_row_plots / addition_row_plots / treatment_row_plots
 
@@ -182,5 +173,4 @@ ggsave(
   width = 4000,
   height = 4000,
   units = "px",
-  # device = "tiff"
 )

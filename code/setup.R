@@ -1,14 +1,22 @@
+#!/usr/bin/env Rscript
+# ---------------------------
+# Various setup stuff for the project
+# Author: Paul Villanueva (github.com/pommevilla)
+# ---------------------------
 library(tidyverse)
 library(lubridate)
+library(readxl)
 library(janitor)
 library(MetBrewer)
 library(patchwork)
+library(here)
+library(ggtext)
 
 theme_set(
   theme_light() +
     theme(
       panel.grid = element_blank(),
-      axis.line = element_line(color = "black", size = 0.5)
+      axis.line = element_line(color = "black", linewidth = 0.5)
     )
 )
 
@@ -20,7 +28,7 @@ data.priming <- read.csv("data/priming_amoA_deltaCt.csv", header = T) %>%
     fert_level == 0 ~ "0N",
     fert_level == 336 ~ "336N",
     TRUE ~ "112N"
-  ))) 
+  )))
 
 data.raw <- read.csv("data/priming_amoA_rawCt.csv", header = T) %>%
   rename(sample_id = X) %>%

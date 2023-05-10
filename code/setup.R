@@ -79,3 +79,4 @@ names(crop_colors) <- levels(data.priming$crop)
 
 # To make a consistent x-axis for days
 day_breaks <- c(0, 4, 15, 30, 59, 86, 113, 144)
+qpcr_day_breaks <- c(5, 32, 87)

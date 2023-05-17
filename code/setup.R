@@ -16,7 +16,8 @@ theme_set(
   theme_light() +
     theme(
       panel.grid = element_blank(),
-      axis.line = element_line(color = "black", linewidth = 0.5)
+      axis.line = element_line(color = "black", linewidth = 0.5),
+      text = element_text(family = "Times New Roman")
     )
 )
 
@@ -80,3 +81,11 @@ names(crop_colors) <- levels(data.priming$crop)
 # To make a consistent x-axis for days
 day_breaks <- c(0, 4, 15, 30, 59, 86, 113, 144)
 qpcr_day_breaks <- c(5, 32, 87)
+
+# Units
+flux_units <- "mg N kg<sup>-1</sup>"
+per_day_unit <- "day<sup>-1</sup>"
+
+# labels
+ammonia_label <- "NH<sub>4</sub><sup>+</sup>-N"
+nitrate_label <- "NO<sub>3</sub><sup>-</sup>-N"

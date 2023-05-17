@@ -85,6 +85,7 @@ qpcr_day_breaks <- c(5, 32, 87)
 # Units
 flux_units <- "mg N kg<sup>-1</sup>"
 per_day_unit <- "day<sup>-1</sup>"
+gcn_unit <- "gene copies g<sup>-1</sup>"
 
 # labels
 ammonia_label <- "NH<sub>4</sub><sup>+</sup>-N"

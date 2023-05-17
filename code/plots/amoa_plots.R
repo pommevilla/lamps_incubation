@@ -56,8 +56,9 @@ plot_amoa_qpcr <- function(voi, palette, label, free_y = FALSE) {
       panel.border = element_rect(color = "black", fill = NA),
       plot.title = element_text(hjust = 0.5),
       aspect.ratio = 1,
-      strip.text = element_text(color = "black"),
-      strip.background = element_blank()
+      strip.text = element_markdown(color = "black"),
+      strip.background = element_blank(),
+      axis.title.y = element_markdown()
     ) +
     labs(
       y = "",
@@ -80,7 +81,8 @@ plot_amoa_qpcr(Addition, addition_colors, "Addition")
 # Plot of net mineralization against factors
 qpcr_crop_plot <- plot_amoa_qpcr(Crop, crop_colors, "Crop")
 qpcr_addition_plot <- plot_amoa_qpcr(Addition, addition_colors, "Addition") +
-  theme(strip.text = element_blank())
+  theme(strip.text = element_blank()) +
+  labs(y = gcn_unit)
 qpcr_treatment_plot <- plot_amoa_qpcr(Treatment, fertilization_colors, "N Rate") +
   theme(strip.text = element_blank()) +
   labs(x = "Day")
@@ -96,7 +98,8 @@ ggsave(
 
 qpcr_crop_plot <- plot_amoa_qpcr(Crop, crop_colors, "Crop", free_y = TRUE)
 qpcr_addition_plot <- plot_amoa_qpcr(Addition, addition_colors, "Addition", free_y = TRUE) +
-  theme(strip.text = element_blank())
+  theme(strip.text = element_blank()) +
+  labs(y = gcn_unit)
 qpcr_treatment_plot <- plot_amoa_qpcr(Treatment, fertilization_colors, "N Rate", free_y = TRUE) +
   theme(strip.text = element_blank()) +
   labs(x = "Day")

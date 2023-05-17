@@ -18,7 +18,7 @@ qpcr_data <- read.csv(here("data", "Incubation_Biomark-qPCR_all_20230328.csv")) 
 ################### Plots
 # This function will take in a grouping variable and a palette and will
 # plot all the amoAs by that factor.
-plot_amoa_qpcr <- function(voi, palette, label) {
+plot_amoa_qpcr <- function(voi, palette, label, free_y = FALSE) {
   this_dodge <- position_dodge(width = 0.1)
 
   data_df <- qpcr_data %>%
@@ -64,8 +64,13 @@ plot_amoa_qpcr <- function(voi, palette, label) {
       x = "",
       fill = label,
       shape = label
-    ) +
-    facet_wrap(~name, scales = "free_y", nrow = 1)
+    )
+
+  if (free_y) {
+    p <- p + facet_wrap(~name, scales = "free_y", nrow = 1)
+  } else {
+    p <- p + facet_wrap(~name, nrow = 1)
+  }
 
   return(p)
 }
@@ -83,16 +88,32 @@ qpcr_treatment_plot <- plot_amoa_qpcr(Treatment, fertilization_colors, "N Rate")
 (qpcr_crop_plot / qpcr_addition_plot / qpcr_treatment_plot)
 
 ggsave(
-  "figures/qpcr_by_factors.png",
+  "figures/amoa_qpcr/qpcr_by_factors.png",
   width = 3000,
   height = 1900,
   units = "px"
 )
 
+qpcr_crop_plot <- plot_amoa_qpcr(Crop, crop_colors, "Crop", free_y = TRUE)
+qpcr_addition_plot <- plot_amoa_qpcr(Addition, addition_colors, "Addition", free_y = TRUE) +
+  theme(strip.text = element_blank())
+qpcr_treatment_plot <- plot_amoa_qpcr(Treatment, fertilization_colors, "N Rate", free_y = TRUE) +
+  theme(strip.text = element_blank()) +
+  labs(x = "Day")
+
+(qpcr_crop_plot / qpcr_addition_plot / qpcr_treatment_plot)
+
 ggsave(
-  "figures/qpcr_by_factors.tiff",
-  width = 1383,
-  height = 1383,
-  units = "px",
-  device = "tiff"
+  "figures/amoa_qpcr/qpcr_by_factors_free_y.png",
+  width = 3000,
+  height = 1900,
+  units = "px"
 )
+
+# ggsave(
+#   "figures/qpcr_by_factors.tiff",
+#   width = 1383,
+#   height = 1383,
+#   units = "px",
+#   device = "tiff"
+# )

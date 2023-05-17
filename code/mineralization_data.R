@@ -22,35 +22,49 @@ mineralization_data <- read_xlsx("data/FILE_4247_sjh.xlsx", sheet = "Sheet1") %>
       TRUE ~ treatment
     ))
   ) %>%
-  separate(initial_name, c("sample", "timepoint"), sep = -1, remove = FALSE)
+  separate(rev_name, c("sample", "timepoint"), sep = -1, remove = FALSE)
 
 ################## Calculate Net N mineralization
 # Net N mineralization is calculated via taking the difference in the sum of
-# nitrate and ammonium between the two days,, divided by the length of time
+# nitrate and ammonium between two days, divided by the length of time
 # between the two measurements. For example, to calculate the net M
-# mineralization between days 5 and 0, we would use:
-# [(Day 5-NO3N_mg.kg + Day 5-NH4N.mg.kg) - (Day 0-NO3N_mg.kg + Day 0-NH4N.mg.kg)] / (5-0)
+# mineralization between days 32 and 5, we would use:
+# [(Day 32-NO3N_mg.kg + Day 32-NH4N.mg.kg) - (Day 5-NO3N_mg.kg + Day 5-NH4N.mg.kg)] / (32-5)
+# We calculate two versions - one relative to the previous measurement (as above) called
+# net_min_rate_rel, and one relative to the first measurement called net_min_rate_abs.
+# We do similar calculations for net nitrification
 mineralization_data <- mineralization_data %>%
   group_by(sample) %>%
   mutate(
-    net_n_1 = no3n_mg_kg_1 + nh4n_mg_kg_1,
-    net_n_2 = no3n_mg_kg_2 + nh4n_mg_kg_2
+    net_n_min = no3n_mg_kg_1 + nh4n_mg_kg_1,
   ) %>%
   mutate(
     delta = day - lag(day, default = 0),
-    net_mineralization_1 = if_else(
+    net_min_rate_rel = if_else(
       delta == 0,
       0,
-      (net_n_1 - lag(net_n_1)) / delta
+      (net_n_min - lag(net_n_min)) / delta
     ),
-    net_mineralization_2 = if_else(
+    net_min_rate_abs = if_else(
       delta == 0,
       0,
-      (net_n_2 - lag(net_n_2)) / delta
+      (net_n_min - first(net_n_min)) / delta
+    ),
+    net_nitr_rate_rel = if_else(
+      delta == 0,
+      0,
+      (no3n_mg_kg_1 - lag(no3n_mg_kg_1)) / delta
+    ),
+    net_nitr_rate_abs = if_else(
+      delta == 0,
+      0,
+      (no3n_mg_kg_1 - first(no3n_mg_kg_1)) / delta
+    ),
+    crop = if_else(
+      crop == "corn", "Corn", "Miscanthus"
     )
   ) %>%
   ungroup()
-
 
 ################## Write out net mineralization data
 write.csv(

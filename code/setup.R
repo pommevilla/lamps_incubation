@@ -90,3 +90,27 @@ gcn_unit <- "gene copies g<sup>-1</sup>"
 # labels
 ammonia_label <- "NH<sub>4</sub><sup>+</sup>-N"
 nitrate_label <- "NO<sub>3</sub><sup>-</sup>-N"
+
+# variable names
+mineralization_variables <- c(
+  "net_min_rate_rel", "net_min_rate_abs",
+  "net_nitr_rate_rel", "net_nitr_rate_abs",
+  "no3n_mg_kg_1", "nh4n_mg_kg_1"
+)
+
+qpcr_variables <- c(
+  "log_012", "ave_012", "log_025", "ave_025",
+  "log_039", "ave_039", "f1r2_log", "f1r2_ave"
+)
+
+# Helper functions
+get_p_sig <- function(p_value) {
+  sig_marker <- case_when(
+    p_value < 0.001 ~ "***",
+    p_value < 0.01 ~ "**",
+    p_value < 0.05 ~ "*",
+    TRUE ~ ""
+  )
+
+  return(sig_marker)
+}

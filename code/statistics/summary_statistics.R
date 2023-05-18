@@ -1,6 +1,6 @@
 #!/usr/bin/env Rscript
 # ---------------------------
-# Prints out summary tables
+# Calculates means for mineralization and qPCR data by main factors
 # Author: Paul Villanueva (github.com/pommevilla)
 # ---------------------------
 
@@ -14,9 +14,7 @@ library(gtsummary)
 mineralization_and_amoa_data <- read.csv("data/prepped_data/mineralization_and_qpcr_data.csv")
 
 ################ Summary statistics of mineralization by AmoA
-
-# crop_summary_statistics <-
-
+# Helper function
 calc_summary_stats <- function(voi) {
   mineralization_and_amoa_data %>%
     select(
@@ -39,11 +37,13 @@ calc_summary_stats <- function(voi) {
     )
 }
 
+# Generate summary statistics for each main factor
+# TODO: Is there a way to do this with gtsummary::tbl_strata?
 crop_summary_statistics <- calc_summary_stats(crop)
 treatment_summary_statistics <- calc_summary_stats(treatment)
 addition_summary_statistics <- calc_summary_stats(addition)
 
-
+# Combine all summary statistics, removing redundant ID columns
 all_summaries <- bind_cols(
   addition_summary_statistics,
   crop_summary_statistics,

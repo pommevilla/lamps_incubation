@@ -6,7 +6,7 @@
 # Author: Paul Villanueva (github.com/pommevilla)
 # ---------------------------
 ################## Setup
-source("code/setup.R")
+source("code/setup/setup.R")
 
 ################## Read in data
 # The different calculations for ammonium and nitrate are contained in the first sheet,

@@ -6,7 +6,7 @@
 
 ################## Setup
 # General setup scripts
-source("code/setup.R")
+source("code/setup/setup.R")
 
 # Read in data
 mineralization_and_amoa_data <- read.csv("data/prepped_data/mineralization_and_qpcr_data.csv")

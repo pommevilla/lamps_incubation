@@ -4,7 +4,7 @@
 # Author: Paul Villanueva (github.com/pommevilla)
 # ---------------------------
 ################## Setup
-source("code/setup.R")
+source("code/setup/setup.R")
 
 # Read in data
 qpcr_data <- read.csv(here("data", "Incubation_Biomark-qPCR_all_20230328.csv")) %>%

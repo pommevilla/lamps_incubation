@@ -6,7 +6,7 @@
 
 ################## Setup
 # General setup scripts
-source("code/setup.R")
+source("code/setup/setup.R")
 library(gt)
 library(gtsummary)
 

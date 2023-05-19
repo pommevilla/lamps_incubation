@@ -4,7 +4,7 @@
 # Author: Paul Villanueva (github.com/pommevilla)
 # ---------------------------
 ################## Setup
-source("code/setup.R")
+source("code/setup/setup.R")
 
 # Read in data
 mineralization_data <- read.csv(here("data/prepped_data", "mineralization_data.csv"))

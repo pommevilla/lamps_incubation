@@ -120,3 +120,60 @@ ggsave(
 #   units = "px",
 #   device = "tiff"
 # )
+
+
+
+#################### qPCR barchart
+# Across all treatments and days, what is the average abundance of each amoA?
+# The `how_much_more` column is how many more times abundant each primer is
+# relative to F1R2, the classic literature primer.
+# avg_qpcr_numbers <-
+
+avg_qpcr_numbers <- qpcr_data %>%
+  select(contains("ave")) %>%
+  pivot_longer(everything()) %>%
+  group_by(name) %>%
+  summarise(
+    mean = mean(value),
+    sd = sd(value),
+    se = sd / sqrt(n())
+  ) %>%
+  mutate(
+    name = case_when(
+      name == "F1R2_ave" ~ "F1R2",
+      TRUE ~ str_replace(name, "ave_", "amoA ")
+    )
+  ) %>%
+  mutate(
+    how_much_more = round(mean / first(mean), 1),
+    how_much_more = paste0(how_much_more, "x")
+  ) %>%
+  mutate(
+    rel_abund = mean / sum(mean)
+  )
+
+avg_qpcr_numbers %>%
+  ggplot(aes(name, mean)) +
+  geom_col(width = 0.5) +
+  geom_errorbar(aes(ymin = mean - se, ymax = mean + se), width = 0.2) +
+  geom_label(
+    data = avg_qpcr_numbers %>% filter(name != "F1R2"),
+    aes(x = name, y = mean, label = how_much_more),
+    nudge_y = -0.25e8
+  ) +
+  labs(
+    x = "Primer set",
+    y = gcn_unit,
+  ) +
+  theme(
+    panel.border = element_blank(),
+    axis.title.y = element_markdown(),
+  ) +
+  scale_y_continuous(
+    labels = scales::scientific,
+    expand = expansion(0, 0.2)
+  )
+
+ggsave(
+  here::here("figures/amoa_qpcr/amoA_qpcr_barchart.png"),
+)

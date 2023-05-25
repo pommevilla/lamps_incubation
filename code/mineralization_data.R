@@ -89,7 +89,7 @@ mineralization_and_qpcr_data <- left_join(
     select(-c(order, crop, treatment, addition, dna_doe, nh4n_mgl, no3n_mgl)),
   mineralization_data,
   by = c(
-    "sample_name" = "initial_name"
+    "sample_name" = "rev_name"
   )
 )
 

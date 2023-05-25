@@ -1,0 +1,5 @@
+primers,qpcr_values,stress
+all,ave,0.108
+mfp,ave,0.035
+all,log,0.104
+mfp,log,0.032

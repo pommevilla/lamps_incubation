@@ -1,0 +1,17 @@
+primers,qpcr_values,factor,r_squared,p_value
+all,ave,Day,0.16,0.001
+all,ave,Crop,0.124,0.001
+all,ave,Treatment,0.038,0.001
+all,ave,Addition,-0.009,0.99
+mfp,ave,Day,0.16,0.001
+mfp,ave,Crop,0.124,0.001
+mfp,ave,Treatment,0.033,0.001
+mfp,ave,Addition,-0.009,0.99
+all,log,Day,0.141,0.001
+all,log,Crop,0.076,0.001
+all,log,Treatment,0.199,0.001
+all,log,Addition,-0.01,0.99
+mfp,log,Day,0.148,0.001
+mfp,log,Crop,0.095,0.001
+mfp,log,Treatment,0.149,0.001
+mfp,log,Addition,-0.01,0.995

@@ -46,9 +46,9 @@ data.priming.long$sample_id <- fct_reorder(data.priming.long$sample_id, parse_nu
 df <- data.priming[, -1]
 rownames(df) <- data.priming[, 1]
 
-metadata <- df %>%
-  select(fert_level:field_rep) %>%
-  mutate(across(everything(), as.factor))
+# metadata <- df %>%
+#   select(fert_level:field_rep) %>%
+#   mutate(across(everything(), as.factor))
 
 
 amoa_counts <- df %>%

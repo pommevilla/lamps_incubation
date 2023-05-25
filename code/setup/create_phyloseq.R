@@ -9,33 +9,45 @@
 library(vegan)
 library(phyloseq)
 
-################## Creating the phyloseq object
-otus <- mineralization_and_qpcr_data %>%
-    select(sample_name, contains(c("ave", "log"))) %>%
-    column_to_rownames("sample_name") %>%
-    t() %>%
-    otu_table(., taxa_are_rows = TRUE)
+################## Helper function to create phyloseq objects
+create_phyloseq <- function(qpcr_df, logged = FALSE) {
+    if (logged) {
+        otu_df <- qpcr_df %>%
+            select(sample_name, contains("log"))
+    } else {
+        otu_df <- qpcr_df %>%
+            select(sample_name, contains("ave"))
+    }
 
-metadata <- mineralization_and_qpcr_data %>%
-    select(sample_name, Day, Crop, Treatment, Addition) %>%
-    column_to_rownames("sample_name") %>%
-    sample_data()
+    otus <- otu_df %>%
+        column_to_rownames("sample_name") %>%
+        t() %>%
+        otu_table(., taxa_are_rows = TRUE)
 
-taxonomy <- matrix(
-    sample(letters, nrow(otus) * 7, replace = TRUE),
-    nrow = nrow(otus),
-    ncol = 7,
-    dimnames = list(
-        rownames(otus),
-        c("Kingdom", "Phylum", "Class", "Order", "Family", "Genus", "Species")
+    metadata <- qpcr_df %>%
+        select(sample_name, Day, Crop, Treatment, Addition) %>%
+        mutate(Day = as.factor(Day)) %>%
+        column_to_rownames("sample_name") %>%
+        sample_data()
+
+    taxonomy <- matrix(
+        sample(letters, nrow(otus) * 7, replace = TRUE),
+        nrow = nrow(otus),
+        ncol = 7,
+        dimnames = list(
+            rownames(otus),
+            c("Kingdom", "Phylum", "Class", "Order", "Family", "Genus", "Species")
+        )
+    ) %>%
+        tax_table()
+
+    physeq <- phyloseq(
+        otus,
+        taxonomy,
+        metadata
     )
-) %>%
-    tax_table()
 
-physeq <- phyloseq(
-    otus,
-    taxonomy,
-    metadata
-)
+    return(physeq)
+}
 
-rm(otus, metadata, taxonomy)
+################## Metadata for qPCR data

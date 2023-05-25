@@ -1,0 +1,17 @@
+term,df,SumOfSqs,statistic,p.value,primers,qpcr_values
+Day,2,2.475,14.254,0.001,all,ave
+Treatment,2,0.566,3.258,0.003,all,ave
+Addition,2,0.097,0.561,0.856,all,ave
+Crop,1,0.58,6.681,0.001,all,ave
+Day,2,2.485,14.357,0.001,mfp,ave
+Treatment,2,0.526,3.041,0.006,mfp,ave
+Addition,2,0.097,0.563,0.832,mfp,ave
+Crop,1,0.579,6.686,0.002,mfp,ave
+Day,2,0.018,10.73,0.001,all,log
+Treatment,2,0.014,8.398,0.001,all,log
+Addition,2,0.001,0.405,0.776,all,log
+Crop,1,0.003,3.284,0.047,all,log
+Day,2,0.014,10.434,0.001,mfp,log
+Treatment,2,0.01,7.143,0.001,mfp,log
+Addition,2,0.001,0.417,0.784,mfp,log
+Crop,1,0.002,3.554,0.036,mfp,log

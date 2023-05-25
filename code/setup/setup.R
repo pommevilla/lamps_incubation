@@ -78,6 +78,9 @@ names(fertilization_colors) <- c("0N", "112N", "336N")
 crop_colors <- met.brewer("Java", 2, direction = -1)
 names(crop_colors) <- levels(data.priming$crop)
 
+qpcr_day_colors <- met.brewer("Greek", 3)
+names(qpcr_day_colors) <- c("4", "30", "86")
+
 # To make a consistent x-axis for days
 day_breaks <- c(0, 4, 15, 30, 59, 86, 113, 144)
 qpcr_day_breaks <- c(5, 32, 87)

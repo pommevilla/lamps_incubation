@@ -10,7 +10,10 @@ library(vegan)
 library(phyloseq)
 
 ################## Helper function to create phyloseq objects
-create_phyloseq <- function(qpcr_df, logged = FALSE) {
+# qpcr_df is dataframe with all of the rows and columns from the qPCR data
+# logged is for whether or the analysis should be for the logged or average qPCR counts
+# include_f1r2 is for whether or not to include the existing primers
+create_phyloseq <- function(qpcr_df, logged = FALSE, include_f1r2 = TRUE) {
     if (logged) {
         otu_df <- qpcr_df %>%
             select(sample_name, contains("log"))
@@ -19,7 +22,13 @@ create_phyloseq <- function(qpcr_df, logged = FALSE) {
             select(sample_name, contains("ave"))
     }
 
+    if (!include_f1r2) {
+        otu_df <- otu_df %>%
+            select(-contains("f1r2"))
+    }
+
     otus <- otu_df %>%
+        select(-any_of("log_sum")) %>%
         column_to_rownames("sample_name") %>%
         t() %>%
         otu_table(., taxa_are_rows = TRUE)

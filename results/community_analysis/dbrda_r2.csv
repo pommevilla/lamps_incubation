@@ -1,0 +1,5 @@
+primers,qpcr_values,r2,adj_r2
+all,ave,0.193,0.166
+mfp,ave,0.192,0.164
+all,log,0.191,0.163
+mfp,log,0.183,0.155

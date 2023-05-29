@@ -76,7 +76,9 @@ anova_results_long <- bind_rows(
 
 write.csv(
     anova_results_long,
-    here::here("results/stats", "n_anova_results.long.csv")
+    here::here("results/stats", "n_anova_results.long.csv"),
+    row.names = FALSE,
+    quote = FALSE
 )
 
 # Pivoting to a wide format for presentations
@@ -86,5 +88,7 @@ anova_results_wide <- anova_results_long %>%
 
 write.csv(
     anova_results_wide,
-    here::here("results/stats", "n_anova_results.wide.csv")
+    here::here("results/stats", "n_anova_results.wide.csv"),
+    row.names = FALSE,
+    quote = FALSE
 )

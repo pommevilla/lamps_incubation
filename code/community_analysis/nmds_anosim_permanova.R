@@ -11,12 +11,6 @@ source("code/setup/create_phyloseq.R")
 
 # Read in data
 mineralization_and_qpcr_data <- read.csv(here("data/prepped_data", "mineralization_and_qpcr_data.csv")) %>%
-    rename(
-        Crop = crop,
-        Day = day,
-        Treatment = treatment,
-        Addition = addition
-    ) %>%
     mutate(Day = as.factor(Day))
 
 # Separating out the metadata can be helpful for later

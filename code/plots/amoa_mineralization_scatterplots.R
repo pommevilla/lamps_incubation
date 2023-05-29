@@ -7,12 +7,8 @@
 source("code/setup/setup.R")
 
 # Read in data
-mineralization_and_qpcr_data <- read.csv(here("data/prepped_data", "mineralization_and_qpcr_data.csv")) %>%
-  rename(
-    Crop = crop,
-    Treatment = treatment,
-    Addition = addition
-  )
+mineralization_and_qpcr_data <- read.csv(here("data/prepped_data", "mineralization_and_qpcr_data.csv"))
+
 
 
 ################## Plots

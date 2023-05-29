@@ -9,15 +9,10 @@ source("code/setup/setup.R")
 ######## Read in data
 n2o_data <- read.csv("data/prepped_data/n2o_data.csv")
 co2_data <- read.csv("data/prepped_data/co2_data.csv")
-# nh4_no3_mineralization_data <- read.csv("data/prepped_data/mineralization_data.csv") %>%
-#     rename(
-#         Day = day,
-#         Crop = crop,
-#         Treatment = treatment,
-#         Addition = addition
-#     )
+
 
 ######## Helper functions
+# This plots a single factor over time.
 plot_lines_over_time <- function(input_df, foi, voi, palette,
                                  plot_title = "", x_label = "", y_label = "",
                                  show_legend = TRUE) {
@@ -54,6 +49,8 @@ plot_lines_over_time <- function(input_df, foi, voi, palette,
     return(p)
 }
 
+# This plots a row of plots for a given factor and palette.
+# TODO: Add arguments for x and y labels
 plot_factor_line <- function(foi, palette) {
     plot_lines_over_time(n2o_data, {{ foi }}, N2ON_flux_ug_g_d, palette, plot_title = n2o_label, show_legend = FALSE) +
         plot_lines_over_time(co2_data, {{ foi }}, CO2_flux_ug_g_d, palette, plot_title = co2_label, show_legend = FALSE) +

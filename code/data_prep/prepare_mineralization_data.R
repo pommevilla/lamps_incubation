@@ -15,7 +15,6 @@ source("code/setup/setup.R")
 mineralization_data <- read_xlsx("data/FILE_4247_sjh.xlsx", sheet = "Sheet1") %>%
   clean_names() %>%
   mutate(
-    crop = str_to_lower(crop),
     treatment = as.factor(case_when(
       treatment == "100N" ~ "112N",
       treatment == "300N" ~ "336N",
@@ -61,8 +60,16 @@ mineralization_data <- mineralization_data %>%
       (no3n_mg_kg_1 - first(no3n_mg_kg_1)) / delta
     ),
     crop = if_else(
-      crop == "corn", "Corn", "Miscanthus"
-    )
+      crop == "Mxg", "Miscanthus", crop
+    ),
+    cum_no3 = cumsum(no3n_mg_kg_1),
+    cum_nh4 = cumsum(nh4n_mg_kg_1),
+  ) %>%
+  rename(
+    Crop = crop,
+    Addition = addition,
+    Treatment = treatment,
+    Day = day
   ) %>%
   ungroup()
 
@@ -78,11 +85,7 @@ write.csv(
 # We'll join the qPCR data with the mineralization data and save it separately
 # since there are fewer qPCR samples.
 qpcr_data <- read.csv("data/Incubation_Biomark-qPCR_all_20230328.csv") %>%
-  clean_names() %>%
-  mutate(across(
-    c(crop, addition),
-    str_to_lower
-  ))
+  clean_names()
 
 mineralization_and_qpcr_data <- left_join(
   qpcr_data %>%

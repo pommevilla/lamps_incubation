@@ -9,6 +9,7 @@ source("code/setup/setup.R")
 ######## Read in data
 n2o_data <- read.csv("data/prepped_data/n2o_data.csv")
 co2_data <- read.csv("data/prepped_data/co2_data.csv")
+nh4_no3_min_data <- read.csv("data/prepped_data/mineralization_data.csv")
 
 
 ######## Helper functions
@@ -50,19 +51,25 @@ plot_lines_over_time <- function(input_df, foi, voi, palette,
 }
 
 # This plots a row of plots for a given factor and palette.
+# There are separate functions for the cumulative version because...
 # TODO: Add arguments for x and y labels
 plot_factor_line <- function(foi, palette) {
     plot_lines_over_time(n2o_data, {{ foi }}, N2ON_flux_ug_g_d, palette, plot_title = n2o_label, show_legend = FALSE) +
         plot_lines_over_time(co2_data, {{ foi }}, CO2_flux_ug_g_d, palette, plot_title = co2_label, show_legend = FALSE) +
-        plot_lines_over_time(n2o_data, {{ foi }}, cum_N2O_flux_ug_g, palette, plot_title = paste("Cumulative", n2o_label), show_legend = FALSE) +
-        plot_lines_over_time(co2_data, {{ foi }}, cum_CO2_flux_ug_g, palette, plot_title = paste("Cumulative", co2_label)) +
+        plot_lines_over_time(nh4_no3_min_data, {{ foi }}, no3n_mg_kg_1, palette, plot_title = nitrate_label, show_legend = FALSE) +
+        plot_lines_over_time(nh4_no3_min_data, {{ foi }}, nh4n_mg_kg_1, palette, plot_title = ammonia_label) +
         plot_layout(nrow = 1)
 }
 
+plot_cumulative_factor_line <- function(foi, palette) {
+    plot_lines_over_time(n2o_data, {{ foi }}, cum_N2O_flux_ug_g, palette, plot_title = n2o_label, show_legend = FALSE) +
+        plot_lines_over_time(co2_data, {{ foi }}, cum_CO2_flux_ug_g, palette, plot_title = co2_label, show_legend = FALSE) +
+        plot_lines_over_time(nh4_no3_min_data, {{ foi }}, cum_no3, palette, plot_title = nitrate_label, show_legend = FALSE) +
+        plot_lines_over_time(nh4_no3_min_data, {{ foi }}, cum_nh4, palette, plot_title = ammonia_label) +
+        plot_layout(nrow = 1)
+}
 
 ######## Plotting
-
-
 crop_line <- plot_factor_line(Crop, crop_colors)
 addition_line <- plot_factor_line(Addition, addition_colors)
 treatment_line <- plot_factor_line(Treatment, fertilization_colors)
@@ -71,6 +78,15 @@ crop_line / addition_line / treatment_line
 
 ggsave(
     here::here("figures/n_figures", "n_line_plots.png"),
+    width = 4500,
+    height = 3000,
+    units = "px"
+)
+
+plot_cumulative_factor_line(Crop, crop_colors) / plot_cumulative_factor_line(Addition, addition_colors) / plot_cumulative_factor_line(Treatment, fertilization_colors)
+
+ggsave(
+    here::here("figures/n_figures", "n_line_plots_cumulative.png"),
     width = 4500,
     height = 3000,
     units = "px"

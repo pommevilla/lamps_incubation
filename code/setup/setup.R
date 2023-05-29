@@ -12,71 +12,31 @@ library(patchwork)
 library(here)
 library(ggtext)
 
+
+####### Plotting setup
 theme_set(
   theme_light() +
     theme(
       panel.grid = element_blank(),
-      axis.line = element_line(color = "black", linewidth = 0.5),
-      text = element_text(family = "Times New Roman")
+      panel.border = element_rect(color = "black", fill = NA),
+      text = element_text(family = "Times New Roman"),
+      plot.title = element_markdown(hjust = 0.5),
+      plot.subtitle = element_markdown(hjust = 0.5)
     )
 )
 
 nice_expansion <- expansion(add = 0, mult = c(0, 0.1))
+nice_dodge <- position_dodge(width = 0.1)
 
-data.priming <- read.csv("data/priming_amoA_deltaCt.csv", header = T) %>%
-  rename(sample_id = X) %>%
-  mutate(fert_level = as.factor(case_when(
-    fert_level == 0 ~ "0N",
-    fert_level == 336 ~ "336N",
-    TRUE ~ "112N"
-  )))
-
-data.raw <- read.csv("data/priming_amoA_rawCt.csv", header = T) %>%
-  rename(sample_id = X) %>%
-  mutate(fert_level = as.factor(fert_level))
-
-data.priming.long <- data.priming %>%
-  pivot_longer(cols = starts_with("amoA"), names_to = "amoA", values_to = "deltaCT")
-
-data.raw.long <- data.raw %>%
-  pivot_longer(cols = starts_with("amoA"), names_to = "amoA", values_to = "CT")
-
-data.priming.long$sample_id <- fct_reorder(data.priming.long$sample_id, parse_number(data.priming.long$sample_id))
-
-df <- data.priming[, -1]
-rownames(df) <- data.priming[, 1]
-
-# metadata <- df %>%
-#   select(fert_level:field_rep) %>%
-#   mutate(across(everything(), as.factor))
-
-
-amoa_counts <- df %>%
-  select(starts_with("amoA"))
-
-n2o <- readr::read_csv("data/N2O.csv") %>%
-  select(-1) %>%
-  mutate(crop_within_block = interaction(crop, rep)) %>%
-  mutate(field_sample = interaction(crop, fert, rep)) %>%
-  mutate(addition = case_when(
-    addition == "Cntrl" ~ "Control",
-    addition == "+C" ~ "+ Carbon",
-    TRUE ~ "+ Nitrogen"
-  ))
-
-co2 <- read.csv("data/priming_calc.csv")
-
-tgas <- read.csv("data/tgas1.csv")
-
-# Colors
+# Factor colors
 addition_colors <- met.brewer("Benedictus", 3)
-names(addition_colors) <- levels(data.priming$addition)
+names(addition_colors) <- c("Control", "Carbon", "Nitrogen")
 
 fertilization_colors <- met.brewer("VanGogh3", 3, type = "continuous")
 names(fertilization_colors) <- c("0N", "112N", "336N")
 
 crop_colors <- met.brewer("Java", 2, direction = -1)
-names(crop_colors) <- levels(data.priming$crop)
+names(crop_colors) <- c("Corn", "Miscanthus")
 
 qpcr_day_colors <- met.brewer("Greek", 3)
 names(qpcr_day_colors) <- c("4", "30", "86")
@@ -85,14 +45,62 @@ names(qpcr_day_colors) <- c("4", "30", "86")
 day_breaks <- c(0, 4, 15, 30, 59, 86, 113, 144)
 qpcr_day_breaks <- c(5, 32, 87)
 
-# Units
+# Units; requires ggtext::element_markdown
 flux_units <- "mg N kg<sup>-1</sup>"
 per_day_unit <- "day<sup>-1</sup>"
 gcn_unit <- "gene copies g<sup>-1</sup>"
 
-# labels
+# Labels; requires ggtext::element_markdown
 ammonia_label <- "NH<sub>4</sub><sup>+</sup>-N"
 nitrate_label <- "NO<sub>3</sub><sup>-</sup>-N"
+co2_label <- "CO<sub>2</sub>"
+n2o_label <- "N<sub>2</sub>O"
+
+
+# data.priming <- read.csv("data/priming_amoA_deltaCt.csv", header = T) %>%
+#   rename(sample_id = X) %>%
+#   mutate(fert_level = as.factor(case_when(
+#     fert_level == 0 ~ "0N",
+#     fert_level == 336 ~ "336N",
+#     TRUE ~ "112N"
+#   )))
+
+# data.raw <- read.csv("data/priming_amoA_rawCt.csv", header = T) %>%
+#   rename(sample_id = X) %>%
+#   mutate(fert_level = as.factor(fert_level))
+
+# data.priming.long <- data.priming %>%
+#   pivot_longer(cols = starts_with("amoA"), names_to = "amoA", values_to = "deltaCT")
+
+# data.raw.long <- data.raw %>%
+#   pivot_longer(cols = starts_with("amoA"), names_to = "amoA", values_to = "CT")
+
+# data.priming.long$sample_id <- fct_reorder(data.priming.long$sample_id, parse_number(data.priming.long$sample_id))
+
+# df <- data.priming[, -1]
+# rownames(df) <- data.priming[, 1]
+
+# metadata <- df %>%
+#   select(fert_level:field_rep) %>%
+#   mutate(across(everything(), as.factor))
+
+
+# amoa_counts <- df %>%
+#   select(starts_with("amoA"))
+
+# n2o <- readr::read_csv("data/N2O.csv") %>%
+#   select(-1) %>%
+#   mutate(crop_within_block = interaction(crop, rep)) %>%
+#   mutate(field_sample = interaction(crop, fert, rep)) %>%
+#   mutate(addition = case_when(
+#     addition == "Cntrl" ~ "Control",
+#     addition == "+C" ~ "+ Carbon",
+#     TRUE ~ "+ Nitrogen"
+#   ))
+
+# co2 <- read.csv("data/priming_calc.csv")
+
+# tgas <- read.csv("data/tgas1.csv")
 
 # variable names
 mineralization_variables <- c(

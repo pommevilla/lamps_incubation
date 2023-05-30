@@ -110,8 +110,20 @@ mineralization_variables <- c(
 )
 
 qpcr_variables <- c(
-  "log_012", "ave_012", "log_025", "ave_025",
-  "log_039", "ave_039", "f1r2_log", "f1r2_ave"
+  "log_012", "ave_012",
+  "log_025", "ave_025",
+  "log_039", "ave_039",
+  "f1r2_log", "F1R2_ave",
+  "ave_norB", "log_norB",
+  "ave_sum", "log_sum"
+)
+
+ave_qpcr_variables <- c(
+  "ave_012", "ave_025", "ave_039", "F1R2_ave", "ave_norB", "ave_sum"
+)
+
+log_qpcr_variables <- c(
+  "log_012", "log_025", "log_039", "F1R2_log", "log_norB", "log_sum"
 )
 
 # Helper functions

@@ -8,17 +8,9 @@
 source("code/setup/setup.R")
 
 ######## Read in data
-n2o_data <- read.csv("data/prepped_data/n2o_data.csv") %>%
+qpcr_data <- read.csv("data/prepped_data/qpcr_data.csv") %>%
     mutate(
-        Day = as.factor(Day)
-    )
-co2_data <- read.csv("data/prepped_data/co2_data.csv") %>%
-    mutate(
-        Day = as.factor(Day)
-    )
-nh4_no3_min_data <- read.csv("data/prepped_data/mineralization_data.csv") %>%
-    mutate(
-        Day = as.factor(Day)
+        Day = as.factor(Day),
     )
 
 ##### Helper functions
@@ -41,12 +33,6 @@ run_anovas <- function(lhs_vars, n_df, rhs_formula = "~ Crop * Addition * Treatm
     ) %>%
         bind_rows() %>%
         filter(term != "Residuals") %>%
-        mutate(
-            term = str_replace(term, "day", "Day"),
-            term = str_replace(term, "crop", "Crop"),
-            term = str_replace(term, "addition", "Addition"),
-            term = str_replace(term, "treatment", "Treatment")
-        ) %>%
         mutate(sig = get_p_sig(p.value)) %>%
         mutate(p.value = round(p.value, 3)) %>%
         mutate(order = str_count(term, ":")) %>%
@@ -56,27 +42,11 @@ run_anovas <- function(lhs_vars, n_df, rhs_formula = "~ Crop * Addition * Treatm
 }
 
 ################## Run ANOVAS
-# We'll run ANOVAs for each N2O, CO2, Nh4, NO3, mineralization, and nitrification.
-n2o_anovas <- run_anovas(c("N2ON_flux_ug_g_d", "cum_N2O_flux_ug_g"), n2o_data)
-co2_anovas <- run_anovas(c("CO2_flux_ug_g_d", "cum_CO2_flux_ug_g"), co2_data)
-nh4_no3_min_anovas <- run_anovas(
-    c(
-        "net_min_rate_rel", "net_min_rate_abs",
-        "net_nitr_rate_rel", "net_nitr_rate_abs",
-        "no3n_mg_kg_1", "cum_no3",
-        "nh4n_mg_kg_1", "cum_nh4"
-    ),
-    nh4_no3_min_data
-)
-
-# Combining all the results together into long format
-anova_results_long <- bind_rows(
-    n2o_anovas, co2_anovas, nh4_no3_min_anovas
-)
+anova_results_long <- run_anovas(qpcr_variables, qpcr_data)
 
 write.csv(
     anova_results_long,
-    here::here("results/stats", "n_anova_results.long.csv"),
+    here::here("results/stats", "qpcr_anova_results_long.csv"),
     row.names = FALSE,
     quote = FALSE
 )
@@ -88,7 +58,7 @@ anova_results_wide <- anova_results_long %>%
 
 write.csv(
     anova_results_wide,
-    here::here("results/stats", "n_anova_results.wide.csv"),
+    here::here("results/stats", "qpcr_anova_results.wide.csv"),
     row.names = FALSE,
     quote = FALSE
 )

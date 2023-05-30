@@ -84,15 +84,14 @@ write.csv(
 ################## Join with qPCR data
 # We'll join the qPCR data with the mineralization data and save it separately
 # since there are fewer qPCR samples.
-qpcr_data <- read.csv("data/Incubation_Biomark-qPCR_all_20230328.csv") %>%
-  clean_names()
+qpcr_data <- read.csv("data/prepped_data/qpcr_data.csv")
 
 mineralization_and_qpcr_data <- left_join(
   qpcr_data %>%
-    select(-c(order, crop, treatment, addition, dna_doe, nh4n_mgl, no3n_mgl)),
+    select(-c(Order, Crop, Treatment, Addition, Day, NH4N.mgl, NO3N.mgl)),
   mineralization_data,
   by = c(
-    "sample_name" = "rev_name"
+    "Sample.Name" = "rev_name"
   )
 )
 

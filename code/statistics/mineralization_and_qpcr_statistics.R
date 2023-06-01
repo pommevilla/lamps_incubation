@@ -32,17 +32,6 @@ plot_tidied_anova_results <- function(tidied_anova_results) {
 }
 
 ################ ANOVA
-mineralization_variables <- c(
-  "net_min_rate_rel", "net_min_rate_abs",
-  "net_nitr_rate_rel", "net_nitr_rate_abs",
-  "no3n_mg_kg_1", "nh4n_mg_kg_1"
-)
-
-qpcr_variables <- c(
-  "log_012", "ave_012", "log_025", "ave_025",
-  "log_039", "ave_039", "f1r2_log", "f1r2_ave"
-)
-
 # Helper function to run a formula string against the mineralization data
 run_anovas <- function(lhs_vars, rhs_formula) {
   formulae <- lapply(

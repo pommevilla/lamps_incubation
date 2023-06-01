@@ -114,17 +114,31 @@ qpcr_variables <- c(
   "log_025", "ave_025",
   "log_039", "ave_039",
   "F1R2_log", "F1R2_ave",
-  "ave_norB", "log_norB",
-  "ave_sum", "log_sum"
+  "ave_sum", "log_sum",
+  "norB.001", "log_norB.001",
+  "norB.006", "log_norB.006",
+  "cnorB", "log_cnorB",
+  "norb_sum", "log_norb_sum"
 )
 
-ave_qpcr_variables <- c(
-  "ave_012", "ave_025", "ave_039", "F1R2_ave", "ave_norB", "ave_sum"
+# These are variable lists used for plotting in qpcr_plots.R.
+# They're in the order desired for plotting in the plot functions
+ave_amoa_qpcr_variables <- c(
+  "ave_012", "ave_025", "ave_039", "F1R2_ave", "ave_sum"
 )
 
-log_qpcr_variables <- c(
-  "log_012", "log_025", "log_039", "F1R2_log", "log_norB", "log_sum"
+log_amoa_qpcr_variables <- c(
+  "log_012", "log_025", "log_039", "F1R2_log", "log_sum"
 )
+
+ave_norb_qpcr_variables <- c(
+  "norB.001", "norB.006", "norb_sum", "cnorB"
+)
+
+log_norb_qpcr_variables <- c(
+  "log_norB.001", "log_norB.006", "log_norb_sum", "log_cnorB"
+)
+
 
 # Helper functions
 get_p_sig <- function(p_value) {

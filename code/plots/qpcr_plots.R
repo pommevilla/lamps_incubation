@@ -11,9 +11,14 @@ qpcr_data <- read.csv("data/prepped_data/qpcr_data.csv")
 
 
 ################### Plots
-# This function will take in a grouping variable and a palette and will
-# plot all the amoAs by that factor.
-plot_amoa_qpcr <- function(voi, palette, plot_vars, label, free_y = FALSE) {
+# Plots qPCR data by factor over days.
+#   voi: variable of interest. The name of a factor (unquoted) to plot. Can be Crop, Treatment, or Addition.
+#   palette: the palette used for the colors. These are defined in setup.R. Can be crop_colors, fertilization_colors, or addition_colors.
+#   plot_vars: list of variables to plot. Can be a list of any column names (quoted) in qpcr_data.
+#     The variables will be reordered according to this vector. There are some predefined vectors in setup.R.
+#   label: the label for the legend.
+#   free_y: whether or not to free the y-axis for each facet. Defaults to FALSE.
+plot_qpcr <- function(voi, palette, plot_vars, label, free_y = FALSE) {
   this_dodge <- position_dodge(width = 0.1)
 
   data_df <- qpcr_data %>%
@@ -25,9 +30,12 @@ plot_amoa_qpcr <- function(voi, palette, plot_vars, label, free_y = FALSE) {
       se = sd(value) / sqrt(n())
     ) %>%
     mutate(
+      name = factor(name, levels = plot_vars),
       name = case_when(
         str_detect(name, "F1R2") ~ "F1R2",
-        str_detect(name, "norB") ~ "norB",
+        str_detect(name, "cnorB") ~ "norB C",
+        str_detect(name, "norb_sum") ~ "norB Sum",
+        startsWith(name, "norB.") ~ str_replace(name, "norB.", "norB "),
         startsWith(name, "ave") ~ str_replace(name, "ave_", "amoA "),
         TRUE ~ name
       )
@@ -47,7 +55,6 @@ plot_amoa_qpcr <- function(voi, palette, plot_vars, label, free_y = FALSE) {
     scale_shape_manual(values = c(21, 22, 23)) +
     scale_x_continuous(breaks = qpcr_day_breaks) +
     scale_y_continuous(labels = scales::scientific) +
-    # scale_y_continuous(labels = function(x) format(x, scientific = TRUE)) +
     theme(
       panel.border = element_rect(color = "black", fill = NA),
       aspect.ratio = 1,
@@ -72,104 +79,180 @@ plot_amoa_qpcr <- function(voi, palette, plot_vars, label, free_y = FALSE) {
 }
 
 
-
-# Plot of net mineralization against factors
-qpcr_crop_plot <- plot_amoa_qpcr(Crop, crop_colors, ave_qpcr_variables, "Crop")
-qpcr_addition_plot <- plot_amoa_qpcr(Addition, addition_colors, ave_qpcr_variables, "Addition") +
+######### amoA plots
+# non-free y
+amoa_crop_plot <- plot_qpcr(Crop, crop_colors, ave_amoa_qpcr_variables, "Crop")
+amoa_addition_plot <- plot_qpcr(Addition, addition_colors, ave_amoa_qpcr_variables, "Addition") +
   theme(strip.text = element_blank()) +
   labs(y = gcn_unit)
-qpcr_treatment_plot <- plot_amoa_qpcr(Treatment, fertilization_colors, ave_qpcr_variables, "N Rate") +
+amoa_treatment_plot <- plot_qpcr(Treatment, fertilization_colors, ave_amoa_qpcr_variables, "N Rate") +
   theme(strip.text = element_blank()) +
   labs(x = "Day")
 
-(qpcr_crop_plot / qpcr_addition_plot / qpcr_treatment_plot)
+(amoa_crop_plot / amoa_addition_plot / amoa_treatment_plot)
 
 ggsave(
-  "figures/amoa_qpcr/qpcr_by_factors.png",
+  "figures/amoa_qpcr/amoa_qpcr_by_factors.png",
   width = 3000,
   height = 1900,
   units = "px"
 )
 
-qpcr_crop_plot <- plot_amoa_qpcr(Crop, crop_colors, ave_qpcr_variables, "Crop", free_y = TRUE)
-qpcr_addition_plot <- plot_amoa_qpcr(Addition, addition_colors, ave_qpcr_variables, "Addition", free_y = TRUE) +
+# Free y
+amoa_crop_plot <- plot_qpcr(Crop, crop_colors, ave_amoa_qpcr_variables, "Crop", free_y = TRUE)
+amoa_addition_plot <- plot_qpcr(Addition, addition_colors, ave_amoa_qpcr_variables, "Addition", free_y = TRUE) +
   theme(strip.text = element_blank()) +
   labs(y = gcn_unit)
-qpcr_treatment_plot <- plot_amoa_qpcr(Treatment, fertilization_colors, ave_qpcr_variables, "N Rate", free_y = TRUE) +
+amoa_treatment_plot <- plot_qpcr(Treatment, fertilization_colors, ave_amoa_qpcr_variables, "N Rate", free_y = TRUE) +
   theme(strip.text = element_blank()) +
   labs(x = "Day")
 
-(qpcr_crop_plot / qpcr_addition_plot / qpcr_treatment_plot)
+(amoa_crop_plot / amoa_addition_plot / amoa_treatment_plot)
 
 ggsave(
-  "figures/amoa_qpcr/qpcr_by_factors_free_y.png",
+  "figures/amoa_qpcr/amoa_qpcr_by_factors_free_y.png",
   width = 4000,
   height = 3000,
   units = "px"
 )
 
-# ggsave(
-#   "figures/qpcr_by_factors.tiff",
-#   width = 1383,
-#   height = 1383,
-#   units = "px",
-#   device = "tiff"
-# )
+######### norB plots
+# non-free y
+norb_crop_plot <- plot_qpcr(Crop, crop_colors, ave_norb_qpcr_variables, "Crop")
+norb_addition_plot <- plot_qpcr(Addition, addition_colors, ave_norb_qpcr_variables, "Addition") +
+  theme(strip.text = element_blank()) +
+  labs(y = gcn_unit)
+norb_treatment_plot <- plot_qpcr(Treatment, fertilization_colors, ave_norb_qpcr_variables, "N Rate") +
+  theme(strip.text = element_blank()) +
+  labs(x = "Day")
 
+(norb_crop_plot / norb_addition_plot / norb_treatment_plot)
 
+ggsave(
+  "figures/amoa_qpcr/norb_qpcr_by_factors.png",
+  width = 2500,
+  height = 1900,
+  units = "px"
+)
+
+# Free y
+norb_crop_plot <- plot_qpcr(Crop, crop_colors, ave_norb_qpcr_variables, "Crop", free_y = TRUE)
+norb_addition_plot <- plot_qpcr(Addition, addition_colors, ave_norb_qpcr_variables, "Addition", free_y = TRUE) +
+  theme(strip.text = element_blank()) +
+  labs(y = gcn_unit)
+norb_treatment_plot <- plot_qpcr(Treatment, fertilization_colors, ave_norb_qpcr_variables, "N Rate", free_y = TRUE) +
+  theme(strip.text = element_blank()) +
+  labs(x = "Day")
+
+(norb_crop_plot / norb_addition_plot / norb_treatment_plot)
+
+ggsave(
+  "figures/amoa_qpcr/norb_qpcr_by_factors_free_y.png",
+  width = 4000,
+  height = 3000,
+  units = "px"
+)
 
 #################### qPCR barchart
-# Across all treatments and days, what is the average abundance of each amoA?
+# How much more are we detecting with our primers?
 # The `how_much_more` column is how many more times abundant each primer is
 # relative to F1R2, the classic literature primer.
-avg_qpcr_numbers <- qpcr_data %>%
-  select(any_of(ave_qpcr_variables)) %>%
-  pivot_longer(everything()) %>%
-  group_by(name) %>%
-  summarise(
-    mean = mean(value),
-    sd = sd(value),
-    se = sd / sqrt(n())
-  ) %>%
+
+# Plots how much more abundant each of the plot_vars is relative to the
+# baseline_qpcr variable
+calc_rel_abundance <- function(qpcr_df, plot_vars, baseline_qpcr) {
+  avg_qpcr_numbers <- qpcr_df %>%
+    select(any_of(plot_vars)) %>%
+    pivot_longer(everything()) %>%
+    group_by(name) %>%
+    summarise(
+      mean = mean(value),
+      sd = sd(value),
+      se = sd / sqrt(n())
+    )
+
+  baseline_abundance <- avg_qpcr_numbers %>%
+    filter(name == baseline_qpcr) %>%
+    pull(mean)
+
+  avg_qpcr_numbers <- avg_qpcr_numbers %>%
+    mutate(
+      how_much_more = round(mean / baseline_abundance, 1),
+      how_much_more = paste0(how_much_more, "x"),
+      rel_abund = mean / sum(mean)
+    )
+
+  return(avg_qpcr_numbers)
+}
+
+norb_rel_abundances <- calc_rel_abundance(qpcr_data, ave_norb_qpcr_variables, "cnorB") %>%
+  mutate(
+    name = case_when(
+      str_detect(name, "cnorB") ~ "norB C",
+      str_detect(name, "norb_sum") ~ "norB Sum",
+      startsWith(name, "norB.") ~ str_replace(name, "norB.", "norB "),
+      TRUE ~ name
+    ),
+    gene = "norB",
+    baseline = if_else(name == "norB C", "baseline", "not baseline")
+  )
+
+amoa_rel_abundances <- calc_rel_abundance(qpcr_data, ave_amoa_qpcr_variables, "F1R2_ave") %>%
   mutate(
     name = case_when(
       str_detect(name, "F1R2") ~ "F1R2",
-      str_detect(name, "norB") ~ "norB",
       startsWith(name, "ave") ~ str_replace(name, "ave_", "amoA "),
       TRUE ~ name
-    )
-  ) %>%
-  mutate(
-    how_much_more = round(mean / first(mean), 1),
-    how_much_more = paste0(how_much_more, "x"),
-    rel_abund = mean / sum(mean),
-    name = factor(name, levels = c(
-      "F1R2", "amoA 012", "amoA 025", "amoA 039", "amoA sum", "norB"
-    ))
+    ),
+    gene = "amoA",
+    baseline = if_else(name == "F1R2", "baseline", "not baseline")
   )
 
-avg_qpcr_numbers %>%
-  ggplot(aes(name, mean)) +
-  geom_col(width = 0.5) +
-  geom_errorbar(aes(ymin = mean - se, ymax = mean + se), width = 0.2) +
-  geom_label(
-    data = avg_qpcr_numbers %>% filter(name != "F1R2"),
-    aes(x = name, y = mean, label = how_much_more),
-    nudge_y = -0.25e8
-  ) +
-  labs(
-    x = "Primer set",
-    y = gcn_unit,
-  ) +
-  theme(
-    panel.border = element_blank(),
-    axis.title.y = element_markdown(),
-  ) +
-  scale_y_continuous(
-    labels = scales::scientific,
-    expand = expansion(0, 0.2)
-  )
+combined_abundances <- bind_rows(
+  amoa_rel_abundances,
+  norb_rel_abundances
+)
+
+plot_rel_abundances <- function(abundance_df) {
+  abundance_df %>%
+    ggplot(aes(name, mean, fill = baseline)) +
+    geom_errorbar(aes(ymin = mean - se, ymax = mean + se), width = 0.2) +
+    geom_col(width = 0.5) +
+    geom_label(
+      inherit.aes = FALSE,
+      data = abundance_df %>% filter(baseline != "baseline"),
+      aes(x = name, y = mean, label = how_much_more),
+      nudge_y = -0.25e8
+    ) +
+    labs(
+      x = "",
+      y = "Abundance relative to existing primers",
+      fill = ""
+    ) +
+    theme(
+      panel.border = element_rect(color = "black", fill = NA),
+      axis.title.y = element_markdown(),
+      strip.text = element_markdown(color = "black"),
+      strip.background = element_blank(),
+    ) +
+    scale_y_continuous(
+      labels = scales::scientific,
+      expand = expansion(0, 0.2)
+    ) +
+    scale_fill_manual(
+      values = c("baseline" = "grey", "not baseline" = "black"),
+      labels = c("baseline" = "Existing primers", "not baseline" = "MFP primers")
+    ) +
+    facet_grid(~gene, scales = "free_x")
+}
+
+plot_rel_abundances(combined_abundances)
+
+
 
 ggsave(
-  here::here("figures/amoa_qpcr/amoA_qpcr_barchart.png"),
+  here::here("figures/amoa_qpcr/qpcr_rel_abundances_barchart.png"),
+  width = 10,
+  height = 6,
+  units = "in"
 )

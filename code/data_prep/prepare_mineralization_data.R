@@ -95,6 +95,20 @@ mineralization_and_qpcr_data <- left_join(
   )
 )
 
+# We'll also join in the n2o data. We'll filter out the data
+# without a sample name. Checking has already been done to ensure
+# Crop, Treatment, and Addition match, so we drop everything besides the
+# sample name and the N2O data.
+n2o_data <- read.csv("data/prepped_data/n2o_data.csv") %>%
+  filter(sample_name != "0") %>%
+  select(sample_name, N2ON_flux_ug_g_d, cum_N2O_flux_ug_g)
+
+mineralization_and_qpcr_data <- left_join(
+  mineralization_and_qpcr_data,
+  n2o_data,
+  by = c("Sample.Name" = "sample_name")
+)
+
 write.csv(
   mineralization_and_qpcr_data,
   here("data/prepped_data", "mineralization_and_qpcr_data.csv"),

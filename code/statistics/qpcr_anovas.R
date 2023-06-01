@@ -58,7 +58,7 @@ anova_results_wide <- anova_results_long %>%
 
 write.csv(
     anova_results_wide,
-    here::here("results/stats", "qpcr_anova_results.wide.csv"),
+    here::here("results/stats", "qpcr_anova_results_wide.csv"),
     row.names = FALSE,
     quote = FALSE
 )

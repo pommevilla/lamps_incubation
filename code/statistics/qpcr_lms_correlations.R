@@ -115,7 +115,21 @@ result_df <- result_df %>%
 
 write.csv(
     result_df,
-    "results/stats/qpcr_n_correlations_lms.csv",
+    "results/stats/qpcr_n_correlations_lms_all.csv",
+    row.names = FALSE,
+    quote = FALSE
+)
+
+write.csv(
+    result_df %>% filter(!str_detect(qpcr_var, "log")),
+    "results/stats/qpcr_n_correlations_lms_ave.csv",
+    row.names = FALSE,
+    quote = FALSE
+)
+
+write.csv(
+    result_df %>% filter(str_detect(qpcr_var, "log")),
+    "results/stats/qpcr_n_correlations_lms_log.csv",
     row.names = FALSE,
     quote = FALSE
 )

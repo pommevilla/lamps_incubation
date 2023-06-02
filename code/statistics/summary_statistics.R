@@ -18,7 +18,12 @@ mineralization_and_qpcr_data <- read.csv("data/prepped_data/mineralization_and_q
 calc_summary_stats <- function(voi) {
   mineralization_and_qpcr_data %>%
     select(
-      any_of(qpcr_variables),
+      any_of(c(
+        qpcr_variables,
+        mineralization_variables,
+        "cum_no3", "cum_nh4", "cum_N2O_flux_ug_g",
+        contains("N2O")
+      )),
       {{ voi }},
     ) %>%
     tbl_summary(

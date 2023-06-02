@@ -98,10 +98,6 @@ n2o_label <- "N<sub>2</sub>O"
 #     TRUE ~ "+ Nitrogen"
 #   ))
 
-# co2 <- read.csv("data/priming_calc.csv")
-
-# tgas <- read.csv("data/tgas1.csv")
-
 # variable names
 mineralization_variables <- c(
   "net_min_rate_rel", "net_min_rate_abs",

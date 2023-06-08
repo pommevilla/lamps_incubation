@@ -49,6 +49,7 @@ qpcr_day_breaks <- c(5, 32, 87)
 flux_units <- "μg N g<sup>-1</sup> soil d<sup>-1</sup>"
 per_day_unit <- "day<sup>-1</sup>"
 gcn_unit <- "gene copies g<sup>-1</sup>"
+inorganic_n_units <- "μg N g<sup>-1</sup> soil"
 
 # Labels; requires ggtext::element_markdown
 ammonia_label <- "NH<sub>4</sub><sup>+</sup>-N"
@@ -169,4 +170,14 @@ make_flux_label <- function(flux_var, cumulative = FALSE) {
   }
 
   return(flux_lab)
+}
+
+make_inorganic_n_label <- function(inorg_n_var, cumulative = FALSE) {
+  inorg_n_lab <- paste0(inorg_n_var, " (", inorganic_n_units, ")")
+
+  if (cumulative) {
+    inorg_n_lab <- paste0("Cumulative ", inorg_n_lab)
+  }
+
+  return(inorg_n_lab)
 }

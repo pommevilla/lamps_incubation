@@ -46,7 +46,7 @@ day_breaks <- c(0, 4, 15, 30, 59, 86, 113, 144)
 qpcr_day_breaks <- c(5, 32, 87)
 
 # Units; requires ggtext::element_markdown
-flux_units <- "mg N kg<sup>-1</sup>"
+flux_units <- "μg N g<sup>-1</sup> soil d<sup>-1</sup>"
 per_day_unit <- "day<sup>-1</sup>"
 gcn_unit <- "gene copies g<sup>-1</sup>"
 
@@ -155,8 +155,18 @@ make_nice_qpcr_names <- function(qpcr_name) {
     str_detect(qpcr_name, "F1R2") ~ "F1R2",
     # str_detect(qpcr_name, "cnorB") ~ qpcr_name,
     str_detect(qpcr_name, "norb_sum") ~ "norB Sum",
-    str_detect(qpcr_name, "norB.") ~ str_replace(qpcr_name, "norB.", "norB "),
-    str_detect(qpcr_name, "ave_") ~ str_replace(qpcr_name, "ave_", "amoA "),
+    str_detect(qpcr_name, "norB.") ~ str_replace(qpcr_name, "norB.", "<i>norB</i> "),
+    str_detect(qpcr_name, "ave_") ~ str_replace(qpcr_name, "ave_", "<i>amo</i>A "),
     TRUE ~ qpcr_name
   )
+}
+
+make_flux_label <- function(flux_var, cumulative = FALSE) {
+  flux_lab <- paste0(flux_var, " flux (", flux_units, ")")
+
+  if (cumulative) {
+    flux_lab <- paste0("Cumulative ", flux_lab)
+  }
+
+  return(flux_lab)
 }

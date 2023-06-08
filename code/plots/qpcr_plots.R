@@ -92,7 +92,7 @@ amoa_treatment_plot <- plot_qpcr(Treatment, fertilization_colors, ave_amoa_qpcr_
 (amoa_crop_plot / amoa_addition_plot / amoa_treatment_plot)
 
 ggsave(
-  "figures/amoa_qpcr/amoa_qpcr_by_factors.png",
+  "figures/qpcr/amoa_qpcr_by_factors.png",
   width = 3000,
   height = 1900,
   units = "px"
@@ -110,7 +110,7 @@ amoa_treatment_plot <- plot_qpcr(Treatment, fertilization_colors, ave_amoa_qpcr_
 (amoa_crop_plot / amoa_addition_plot / amoa_treatment_plot)
 
 ggsave(
-  "figures/amoa_qpcr/amoa_qpcr_by_factors_free_y.png",
+  "figures/qpcr/amoa_qpcr_by_factors_free_y.png",
   width = 4000,
   height = 3000,
   units = "px"
@@ -129,7 +129,7 @@ norb_treatment_plot <- plot_qpcr(Treatment, fertilization_colors, ave_norb_qpcr_
 (norb_crop_plot / norb_addition_plot / norb_treatment_plot)
 
 ggsave(
-  "figures/amoa_qpcr/norb_qpcr_by_factors.png",
+  "figures/qpcr/norb_qpcr_by_factors.png",
   width = 2500,
   height = 1900,
   units = "px"
@@ -147,7 +147,7 @@ norb_treatment_plot <- plot_qpcr(Treatment, fertilization_colors, ave_norb_qpcr_
 (norb_crop_plot / norb_addition_plot / norb_treatment_plot)
 
 ggsave(
-  "figures/amoa_qpcr/norb_qpcr_by_factors_free_y.png",
+  "figures/qpcr/norb_qpcr_by_factors_free_y.png",
   width = 4000,
   height = 3000,
   units = "px"
@@ -251,8 +251,96 @@ plot_rel_abundances(combined_abundances)
 
 
 ggsave(
-  here::here("figures/amoa_qpcr/qpcr_rel_abundances_barchart.png"),
+  here::here("figures/qpcr/qpcr_rel_abundances_barchart.png"),
   width = 10,
   height = 6,
   units = "in"
+)
+
+
+########## Plotting abundances by addition within N-rate/crop type
+plot_addition_qpcr_in_group <- function(voi, plot_vars, free_y = FALSE) {
+  this_dodge <- position_dodge(width = 0.1)
+
+  data_df <- qpcr_data %>%
+    pivot_longer(any_of(plot_vars)) %>%
+    group_by(Addition, Day, name, {{ voi }}) %>%
+    summarize(
+      mean_n = mean(value),
+      sd = sd(value),
+      se = sd(value) / sqrt(n())
+    ) %>%
+    mutate(
+      name = factor(name, levels = plot_vars),
+    ) %>%
+    ungroup()
+
+  p <- data_df %>%
+    ggplot(aes(Day, mean_n, fill = Addition, group = Addition, shape = Addition)) +
+    geom_errorbar(
+      aes(ymin = mean_n - se, ymax = mean_n + se),
+      width = 1,
+      position = this_dodge
+    ) +
+    geom_line() +
+    geom_point(size = 4, position = this_dodge) +
+    scale_fill_manual(values = addition_colors) +
+    scale_shape_manual(values = c(21, 22, 23)) +
+    scale_x_continuous(breaks = qpcr_day_breaks) +
+    scale_y_continuous(labels = scales::scientific) +
+    theme(
+      panel.border = element_rect(color = "black", fill = NA),
+      aspect.ratio = 1,
+      strip.text = element_markdown(color = "black"),
+      strip.background = element_blank(),
+      axis.title.y = element_markdown()
+    ) +
+    labs(
+      y = "",
+      x = "",
+      fill = "Addition",
+      shape = "Addition"
+    )
+
+  return(p)
+}
+
+plot_addition_qpcr_in_group(Treatment, ave_norb_qpcr_variables, free_y = TRUE) +
+  facet_grid(Treatment ~ name)
+
+ggsave(
+  here::here("figures/qpcr/norb_addition_in_nrate.png"),
+  width = 4500,
+  height = 3000,
+  units = "px"
+)
+
+plot_addition_qpcr_in_group(Treatment, ave_amoa_qpcr_variables, free_y = TRUE) +
+  facet_grid(Treatment ~ name)
+
+ggsave(
+  here::here("figures/qpcr/amoa_addition_in_nrate.png"),
+  width = 4500,
+  height = 3000,
+  units = "px"
+)
+
+plot_addition_qpcr_in_group(Crop, ave_norb_qpcr_variables, free_y = TRUE) +
+  facet_grid(Crop ~ name)
+
+ggsave(
+  here::here("figures/qpcr/norb_addition_in_crop.png"),
+  width = 4500,
+  height = 3000,
+  units = "px"
+)
+
+plot_addition_qpcr_in_group(Crop, ave_amoa_qpcr_variables, free_y = TRUE) +
+  facet_grid(Crop ~ name)
+
+ggsave(
+  here::here("figures/qpcr/amoa_addition_in_crop.png"),
+  width = 4500,
+  height = 3000,
+  units = "px"
 )

@@ -33,7 +33,6 @@ plot_qpcr <- function(voi, palette, plot_vars, label, free_y = FALSE) {
       name = factor(name, levels = plot_vars, labels = make_nice_qpcr_names(plot_vars)),
     )
 
-
   p <- data_df %>%
     ggplot(aes(Day, mean_n, fill = {{ voi }}, group = {{ voi }}, shape = {{ voi }})) +
     geom_errorbar(
@@ -214,6 +213,7 @@ plot_rel_abundances <- function(abundance_df) {
       axis.title.y = element_markdown(),
       strip.text = element_markdown(color = "black"),
       strip.background = element_blank(),
+      axis.text.x = element_markdown()
     ) +
     scale_y_continuous(
       labels = scales::scientific,

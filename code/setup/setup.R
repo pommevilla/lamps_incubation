@@ -115,14 +115,14 @@ qpcr_variables <- c(
   "ave_sum", "log_sum",
   "norB.001", "log_norB.001",
   "norB.006", "log_norB.006",
-  "cnorB", "log_cnorB",
-  "norb_sum", "log_norb_sum"
+  "norB.sum", "log_norB.sum",
+  "cnorB", "log_cnorB"
 )
 
 # These are variable lists used for plotting in qpcr_plots.R.
 # They're in the order desired for plotting in the plot functions
 ave_amoa_qpcr_variables <- c(
-  "ave_012", "ave_025", "ave_039", "F1R2_ave", "ave_sum"
+  "ave_012", "ave_025", "ave_039", "ave_sum", "F1R2_ave"
 )
 
 log_amoa_qpcr_variables <- c(
@@ -130,7 +130,7 @@ log_amoa_qpcr_variables <- c(
 )
 
 ave_norb_qpcr_variables <- c(
-  "norB.001", "norB.006", "norb_sum", "cnorB"
+  "norB.001", "norB.006", "norB.039", "norB.sum", "cnorB"
 )
 
 log_norb_qpcr_variables <- c(
@@ -148,4 +148,15 @@ get_p_sig <- function(p_value) {
   )
 
   return(sig_marker)
+}
+
+make_nice_qpcr_names <- function(qpcr_name) {
+  qpcr_name <- case_when(
+    str_detect(qpcr_name, "F1R2") ~ "F1R2",
+    # str_detect(qpcr_name, "cnorB") ~ qpcr_name,
+    str_detect(qpcr_name, "norb_sum") ~ "norB Sum",
+    str_detect(qpcr_name, "norB.") ~ str_replace(qpcr_name, "norB.", "norB "),
+    str_detect(qpcr_name, "ave_") ~ str_replace(qpcr_name, "ave_", "amoA "),
+    TRUE ~ qpcr_name
+  )
 }

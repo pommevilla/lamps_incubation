@@ -20,17 +20,17 @@ amoa_data <- read.csv(here("data/qpcr", "Incubation_Biomark-qPCR_all_20230525.cs
 # We keep Crop, Treatment, Addition, and Day to check that these columns
 # match between datasets.
 norb_data <- read.csv(
-  here::here("data/qpcr", "overall_norB_20230530.csv")
+  here::here("data/qpcr", "overall_norB.csv")
 ) %>%
   select(
     Sample.Name, Crop, Treatment, Addition,
-    Day = DNA_DOE, norB.001, norB.006, cnorB
+    Day = DNA_DOE,
+    norB.001, norB.006, norB.039, norB.sum, cnorB
   ) %>%
   mutate(
     Crop = if_else(
       Crop == "Mxg", "Miscanthus", "Corn"
     ),
-    norb_sum = norB.001 + norB.006,
     across(
       contains("norB"),
       log,

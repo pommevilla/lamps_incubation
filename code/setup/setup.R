@@ -46,10 +46,12 @@ day_breaks <- c(0, 4, 15, 30, 59, 86, 113, 144)
 qpcr_day_breaks <- c(5, 32, 87)
 
 # Units; requires ggtext::element_markdown
-flux_units <- "μg N g<sup>-1</sup> soil d<sup>-1</sup>"
+# flux_units <- "μg N g<sup>-1</sup> soil d<sup>-1</sup>"
+flux_units <- "mg N kg<sup>-1</sup> soil d<sup>-1</sup>"
 per_day_unit <- "day<sup>-1</sup>"
 gcn_unit <- "gene copies g<sup>-1</sup>"
-inorganic_n_units <- "μg N g<sup>-1</sup> soil"
+# inorganic_n_units <- "μg N g<sup>-1</sup> soil"
+inorganic_n_units <- "mg N kg<sup>-1</sup> soil"
 
 # Labels; requires ggtext::element_markdown
 ammonia_label <- "NH<sub>4</sub><sup>+</sup>-N"

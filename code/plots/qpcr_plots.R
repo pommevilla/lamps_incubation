@@ -227,7 +227,7 @@ plot_rel_abundances <- function(abundance_df) {
 }
 
 plot_rel_abundances(combined_abundances) +
-  labs(y = paste0(gcn_unit, "<br>(abundance rel. to classic primers  in label)"))
+  labs(y = paste0(gcn_unit, "<br>(abundance rel. to classic primers in label)"))
 
 ggsave(
   here::here("figures/qpcr/qpcr_rel_abundances_barchart.png"),
@@ -238,7 +238,7 @@ ggsave(
 
 
 ########## Plotting abundances by addition within N-rate/crop type
-plot_addition_qpcr_in_group <- function(voi, plot_vars, free_y = FALSE) {
+plot_addition_qpcr_in_group <- function(voi, plot_vars, free_y = FALSE, y_label = gcn_unit, x_label = "Day") {
   this_dodge <- position_dodge(width = 0.1)
 
   data_df <- qpcr_data %>%
@@ -250,7 +250,7 @@ plot_addition_qpcr_in_group <- function(voi, plot_vars, free_y = FALSE) {
       se = sd(value) / sqrt(n())
     ) %>%
     mutate(
-      name = factor(name, levels = plot_vars),
+      name = factor(name, levels = plot_vars, labels = make_nice_qpcr_names(plot_vars)),
     ) %>%
     ungroup()
 
@@ -270,13 +270,13 @@ plot_addition_qpcr_in_group <- function(voi, plot_vars, free_y = FALSE) {
     theme(
       panel.border = element_rect(color = "black", fill = NA),
       aspect.ratio = 1,
-      strip.text = element_markdown(color = "black"),
-      strip.background = element_blank(),
-      axis.title.y = element_markdown()
+      strip.text = element_markdown(color = "black", size = 12),
+      strip.background = element_rect(color = "black", fill = "#C6C6C6"),
+      axis.title.y = element_markdown(size = 12)
     ) +
     labs(
-      y = "",
-      x = "",
+      y = gcn_unit,
+      x = x_label,
       fill = "Addition",
       shape = "Addition"
     )
@@ -289,8 +289,8 @@ plot_addition_qpcr_in_group(Treatment, ave_norb_qpcr_variables, free_y = TRUE) +
 
 ggsave(
   here::here("figures/qpcr/norb_addition_in_nrate.png"),
-  width = 4500,
-  height = 3000,
+  width = 3800,
+  height = 2600,
   units = "px"
 )
 
@@ -299,8 +299,8 @@ plot_addition_qpcr_in_group(Treatment, ave_amoa_qpcr_variables, free_y = TRUE) +
 
 ggsave(
   here::here("figures/qpcr/amoa_addition_in_nrate.png"),
-  width = 4500,
-  height = 3000,
+  width = 3800,
+  height = 2600,
   units = "px"
 )
 
@@ -309,8 +309,8 @@ plot_addition_qpcr_in_group(Crop, ave_norb_qpcr_variables, free_y = TRUE) +
 
 ggsave(
   here::here("figures/qpcr/norb_addition_in_crop.png"),
-  width = 4500,
-  height = 3000,
+  width = 3800,
+  height = 2600,
   units = "px"
 )
 
@@ -319,7 +319,7 @@ plot_addition_qpcr_in_group(Crop, ave_amoa_qpcr_variables, free_y = TRUE) +
 
 ggsave(
   here::here("figures/qpcr/amoa_addition_in_crop.png"),
-  width = 4500,
-  height = 3000,
+  width = 3800,
+  height = 2600,
   units = "px"
 )

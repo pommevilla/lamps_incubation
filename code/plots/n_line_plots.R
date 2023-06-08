@@ -62,14 +62,15 @@ plot_factor_line <- function(foi, palette, show_titles = FALSE) {
         ) +
             plot_lines_over_time(
                 co2_data, {{ foi }}, CO2_flux_ug_g_d, palette,
-                plot_title = "", show_legend = FALSE
+                plot_title = "", show_legend = FALSE, y_label = flux_units
             ) +
             plot_lines_over_time(
                 nh4_no3_min_data, {{ foi }}, no3n_mg_kg_1, palette,
-                plot_title = "", show_legend = FALSE
+                plot_title = "", show_legend = FALSE, y_label = inorganic_n_units
             ) +
             plot_lines_over_time(
                 nh4_no3_min_data, {{ foi }}, nh4n_mg_kg_1, palette,
+                y_label = inorganic_n_units,
                 plot_title = ""
             ) +
             plot_layout(nrow = 1)
@@ -80,15 +81,15 @@ plot_factor_line <- function(foi, palette, show_titles = FALSE) {
         ) +
             plot_lines_over_time(
                 co2_data, {{ foi }}, CO2_flux_ug_g_d, palette,
-                plot_title = co2_label, show_legend = FALSE
+                plot_title = co2_label, show_legend = FALSE, y_label = flux_units
             ) +
             plot_lines_over_time(
                 nh4_no3_min_data, {{ foi }}, no3n_mg_kg_1, palette,
-                plot_title = nitrate_label, show_legend = FALSE
+                plot_title = nitrate_label, show_legend = FALSE, y_label = inorganic_n_units
             ) +
             plot_lines_over_time(
                 nh4_no3_min_data, {{ foi }}, nh4n_mg_kg_1, palette,
-                plot_title = ammonia_label
+                plot_title = ammonia_label, y_label = inorganic_n_units
             ) +
             plot_layout(nrow = 1)
     }
@@ -102,15 +103,15 @@ plot_cumulative_factor_line <- function(foi, palette, show_titles = FALSE) {
         ) +
             plot_lines_over_time(
                 co2_data, {{ foi }}, cum_CO2_flux_ug_g, palette,
-                plot_title = "", show_legend = FALSE
+                plot_title = "", show_legend = FALSE, y_label = flux_units
             ) +
             plot_lines_over_time(
                 nh4_no3_min_data, {{ foi }}, cum_no3, palette,
-                plot_title = "", show_legend = FALSE
+                plot_title = "", show_legend = FALSE, y_label = inorganic_n_units
             ) +
             plot_lines_over_time(
                 nh4_no3_min_data, {{ foi }}, cum_nh4, palette,
-                plot_title = ""
+                plot_title = "", y_label = inorganic_n_units,
             ) +
             plot_layout(nrow = 1)
     } else {
@@ -120,24 +121,18 @@ plot_cumulative_factor_line <- function(foi, palette, show_titles = FALSE) {
         ) +
             plot_lines_over_time(
                 co2_data, {{ foi }}, cum_CO2_flux_ug_g, palette,
-                plot_title = co2_label, show_legend = FALSE
+                plot_title = co2_label, show_legend = FALSE, y_label = flux_units
             ) +
             plot_lines_over_time(
                 nh4_no3_min_data, {{ foi }}, cum_no3, palette,
-                plot_title = nitrate_label, show_legend = FALSE
+                plot_title = nitrate_label, show_legend = FALSE, y_label = inorganic_n_units
             ) +
             plot_lines_over_time(
                 nh4_no3_min_data, {{ foi }}, cum_nh4, palette,
-                plot_title = ammonia_label
+                plot_title = ammonia_label, y_label = inorganic_n_units
             ) +
             plot_layout(nrow = 1)
     }
-
-    # plot_lines_over_time(n2o_data, {{ foi }}, cum_N2O_flux_ug_g, palette, plot_title = n2o_label, show_legend = FALSE) +
-    #     plot_lines_over_time(co2_data, {{ foi }}, cum_CO2_flux_ug_g, palette, plot_title = co2_label, show_legend = FALSE) +
-    #     plot_lines_over_time(nh4_no3_min_data, {{ foi }}, cum_no3, palette, plot_title = nitrate_label, show_legend = FALSE) +
-    #     plot_lines_over_time(nh4_no3_min_data, {{ foi }}, cum_nh4, palette, plot_title = ammonia_label) +
-    #     plot_layout(nrow = 1)
 }
 
 ######## Plotting
@@ -167,41 +162,6 @@ ggsave(
 
 ######## Plotting Addition by other factors
 # To investigate how different soils react to different management practices, we'll plot addition by the other factors.
-n2o_data %>%
-    group_by(Addition, Day, Crop) %>%
-    summarize(
-        mean = mean(N2ON_flux_ug_g_d),
-        sd = sd(N2ON_flux_ug_g_d),
-        se = sd / sqrt(n())
-    ) %>%
-    ungroup() %>%
-    ggplot(aes(Day, mean, fill = Addition, shape = Addition)) +
-    geom_line() +
-    geom_errorbar(
-        aes(ymin = mean - se, ymax = mean + se),
-        width = 4,
-    ) +
-    geom_point(size = 4) +
-    scale_fill_manual(values = addition_colors) +
-    scale_shape_manual(values = c(21, 22, 23)) +
-    labs(
-        x = "x_label",
-        y = "y_label",
-        title = ,
-    ) +
-    theme(
-        aspect.ratio = 1
-    ) +
-    facet_wrap(~Crop)
-
-plot_lines_over_time(
-    n2o_data %>% group_by(Crop),
-    Addition,
-    N2ON_flux_ug_g_d,
-    addition_colors,
-) +
-    facet_grid(~Crop)
-
 plot_addition_lines_over_time <- function(input_df, foi, voi,
                                           plot_title = "", x_label = "", y_label = "",
                                           show_legend = TRUE,
@@ -261,19 +221,17 @@ plot_addition_factor_grid <- function(foi) {
         ) +
         plot_addition_lines_over_time(
             nh4_no3_min_data, {{ foi }}, no3n_mg_kg_1,
-            y_label = make_flux_label(nitrate_label),
+            y_label = make_inorganic_n_label(nitrate_label),
             show_legend = FALSE
         ) +
         plot_addition_lines_over_time(
             nh4_no3_min_data, {{ foi }}, nh4n_mg_kg_1,
-            y_label = make_flux_label(ammonia_label)
+            y_label = make_inorganic_n_label(ammonia_label)
         ) +
         plot_layout(ncol = 1, guides = "collect")
 }
 
 plot_addition_factor_grid(Treatment)
-
-
 
 ggsave(
     here::here("figures/n_figures/n_line_addition_nrate.png"),
@@ -304,12 +262,12 @@ plot_addition_cum_factor_grid <- function(foi) {
         ) +
         plot_addition_lines_over_time(
             nh4_no3_min_data, {{ foi }}, cum_no3,
-            y_label = make_flux_label(nitrate_label, cumulative = TRUE),
+            y_label = make_inorganic_n_label(nitrate_label, cumulative = TRUE),
             show_legend = FALSE
         ) +
         plot_addition_lines_over_time(
             nh4_no3_min_data, {{ foi }}, cum_nh4,
-            y_label = make_flux_label(ammonia_label, cumulative = TRUE)
+            y_label = make_inorganic_n_label(ammonia_label, cumulative = TRUE)
         ) +
         plot_layout(ncol = 1, guides = "collect")
 }
@@ -330,12 +288,4 @@ ggsave(
     width = 2000,
     height = 4000,
     units = "px"
-)
-
-plot_addition_factor_line(Treatment)
-n2o_addition_crop_line <- plot_addition_lines_over_time(
-    n2o_data,
-    Crop,
-    cum_N2O_flux_ug_g,
-    y_label = n2o_label
 )

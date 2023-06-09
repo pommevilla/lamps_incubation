@@ -120,14 +120,18 @@ get_tukey_results <- function(n_vars, n_df) {
         results <- bind_rows(results, these_tukey_results)
     }
 
+    results <- results %>%
+        mutate(adj.p.value = round(adj.p.value, 3)) %>%
+        select(term, contrast, estimate, adj.p.value, n_var)
+
     return(results)
 }
 
 n2o_vars <- c("N2ON_flux_ug_g_d", "cum_N2O_flux_ug_g")
-tester <- get_tukey_results(n2o_vars, n2o_data)
+n2o_tukey <- get_tukey_results(n2o_vars, n2o_data)
 
 co2_vars <- c("CO2_flux_ug_g_d", "cum_CO2_flux_ug_g")
-tester2 <- get_tukey_results(co2_vars, co2_data)
+co2_tukey <- get_tukey_results(co2_vars, co2_data)
 
 inorganic_n_vars <- c(
     "no3n_mg_kg_1", "cum_no3", "nh4n_mg_kg_1", "cum_nh4",
@@ -135,9 +139,9 @@ inorganic_n_vars <- c(
     "net_nitr_rate_rel", "net_nitr_rate_abs"
 )
 
-tester3 <- get_tukey_results(inorganic_n_vars, nh4_no3_min_data)
+inorganic_n_tukey <- get_tukey_results(inorganic_n_vars, nh4_no3_min_data)
 
-tukey_results_long <- bind_rows(tester, tester2, tester3)
+tukey_results_long <- bind_rows(n2o_tukey, co2_tukey, inorganic_n_tukey)
 
 write.csv(
     tukey_results_long,

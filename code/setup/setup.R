@@ -108,7 +108,14 @@ mineralization_variables <- c(
   "no3n_mg_kg_1", "nh4n_mg_kg_1"
 )
 
+# CO2 variables in co2_data
+co2_vars <- c(
+  "CO2_flux_ug_g_d", "cum_CO2_flux_ug_g"
+)
 
+n2o_vars <- c(
+  "N2ON_flux_ug_g_d", "cum_N2O_flux_ug_g"
+)
 
 qpcr_variables <- c(
   "log_012", "ave_012",

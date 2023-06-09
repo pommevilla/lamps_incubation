@@ -46,9 +46,12 @@ day_breaks <- c(0, 4, 15, 30, 59, 86, 113, 144)
 qpcr_day_breaks <- c(5, 32, 87)
 
 # Units; requires ggtext::element_markdown
-flux_units <- "mg N kg<sup>-1</sup>"
+# flux_units <- "μg N g<sup>-1</sup> soil d<sup>-1</sup>"
+flux_units <- "mg N kg<sup>-1</sup> soil d<sup>-1</sup>"
 per_day_unit <- "day<sup>-1</sup>"
 gcn_unit <- "gene copies g<sup>-1</sup>"
+# inorganic_n_units <- "μg N g<sup>-1</sup> soil"
+inorganic_n_units <- "mg N kg<sup>-1</sup> soil"
 
 # Labels; requires ggtext::element_markdown
 ammonia_label <- "NH<sub>4</sub><sup>+</sup>-N"
@@ -105,7 +108,14 @@ mineralization_variables <- c(
   "no3n_mg_kg_1", "nh4n_mg_kg_1"
 )
 
+# CO2 variables in co2_data
+co2_vars <- c(
+  "CO2_flux_ug_g_d", "cum_CO2_flux_ug_g"
+)
 
+n2o_vars <- c(
+  "N2ON_flux_ug_g_d", "cum_N2O_flux_ug_g"
+)
 
 qpcr_variables <- c(
   "log_012", "ave_012",
@@ -115,14 +125,14 @@ qpcr_variables <- c(
   "ave_sum", "log_sum",
   "norB.001", "log_norB.001",
   "norB.006", "log_norB.006",
-  "cnorB", "log_cnorB",
-  "norb_sum", "log_norb_sum"
+  "norB.sum", "log_norB.sum",
+  "cnorB", "log_cnorB"
 )
 
 # These are variable lists used for plotting in qpcr_plots.R.
 # They're in the order desired for plotting in the plot functions
 ave_amoa_qpcr_variables <- c(
-  "ave_012", "ave_025", "ave_039", "F1R2_ave", "ave_sum"
+  "ave_012", "ave_025", "ave_039", "ave_sum", "F1R2_ave"
 )
 
 log_amoa_qpcr_variables <- c(
@@ -130,7 +140,7 @@ log_amoa_qpcr_variables <- c(
 )
 
 ave_norb_qpcr_variables <- c(
-  "norB.001", "norB.006", "norb_sum", "cnorB"
+  "norB.001", "norB.006", "norB.039", "norB.sum", "cnorB"
 )
 
 log_norb_qpcr_variables <- c(
@@ -148,4 +158,35 @@ get_p_sig <- function(p_value) {
   )
 
   return(sig_marker)
+}
+
+make_nice_qpcr_names <- function(qpcr_name) {
+  qpcr_name <- case_when(
+    str_detect(qpcr_name, "F1R2") ~ "F1R2",
+    # str_detect(qpcr_name, "cnorB") ~ qpcr_name,
+    str_detect(qpcr_name, "norb_sum") ~ "norB Sum",
+    str_detect(qpcr_name, "norB.") ~ str_replace(qpcr_name, "norB.", "<i>norB</i> "),
+    str_detect(qpcr_name, "ave_") ~ str_replace(qpcr_name, "ave_", "<i>amo</i>A "),
+    TRUE ~ qpcr_name
+  )
+}
+
+make_flux_label <- function(flux_var, cumulative = FALSE) {
+  flux_lab <- paste0(flux_var, " flux (", flux_units, ")")
+
+  if (cumulative) {
+    flux_lab <- paste0("Cumulative ", flux_lab)
+  }
+
+  return(flux_lab)
+}
+
+make_inorganic_n_label <- function(inorg_n_var, cumulative = FALSE) {
+  inorg_n_lab <- paste0(inorg_n_var, " (", inorganic_n_units, ")")
+
+  if (cumulative) {
+    inorg_n_lab <- paste0("Cumulative ", inorg_n_lab)
+  }
+
+  return(inorg_n_lab)
 }

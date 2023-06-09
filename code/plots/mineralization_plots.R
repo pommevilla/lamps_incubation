@@ -17,7 +17,7 @@ plot_mineralization <- function(voi, palette, net_min_var, label, zero_line = FA
   this_dodge <- position_dodge(width = 0.1)
 
   data_df <- mineralization_data %>%
-    group_by(day, {{ voi }}) %>%
+    group_by(Day, {{ voi }}) %>%
     summarize(
       mean_n = mean({{ net_min_var }}),
       sd = sd({{ net_min_var }}),
@@ -26,7 +26,7 @@ plot_mineralization <- function(voi, palette, net_min_var, label, zero_line = FA
     ungroup()
 
   p <- data_df %>%
-    ggplot(aes(day, mean_n, fill = {{ voi }}, group = {{ voi }}, shape = {{ voi }}))
+    ggplot(aes(Day, mean_n, fill = {{ voi }}, group = {{ voi }}, shape = {{ voi }}))
 
   if (zero_line) {
     p <- p + geom_hline(yintercept = 0, linetype = "dashed", color = "#848884")
@@ -45,8 +45,6 @@ plot_mineralization <- function(voi, palette, net_min_var, label, zero_line = FA
     scale_x_continuous(breaks = day_breaks) +
     theme(
       panel.border = element_rect(color = "black", fill = NA),
-      plot.title = element_text(hjust = 0.5),
-      plot.subtitle = element_text(hjust = 0.5),
       aspect.ratio = 1
     ) +
     labs(
@@ -60,23 +58,10 @@ plot_mineralization <- function(voi, palette, net_min_var, label, zero_line = FA
 }
 
 # Plot of net mineralization against factors
-net_mineralization_plot <- plot_mineralization(crop, crop_colors, net_min_rate_rel, label = "Crop") +
-  plot_mineralization(addition, addition_colors, net_min_rate_rel, label = "Addition") +
-  plot_mineralization(treatment, fertilization_colors, net_min_rate_rel, label = "Fertilization Level")
+net_mineralization_plot <- plot_mineralization(Crop, crop_colors, net_min_rate_rel, label = "Crop") +
+  plot_mineralization(Addition, addition_colors, net_min_rate_rel, label = "Addition") +
+  plot_mineralization(Treatment, fertilization_colors, net_min_rate_rel, label = "Fertilization Level")
 
-net_mineralization_plot
-
-ggsave(
-  "figures/net_mineralization.png"
-)
-
-ggsave(
-  "net_mineralization.tiff",
-  width = 1383,
-  height = 422,
-  units = "px",
-  device = "tiff"
-)
 
 # The next plot will show nitrate, ammonium, and net mineralization broken down by
 # factors. The rows will be the factors and the columns will be nitrate, ammonium, and
@@ -135,9 +120,9 @@ plot_nnn_row <- function(voi, palette, label, titles = FALSE, xaxis = FALSE) {
 
 # Putting rows together...
 wrap_plots(
-  plot_nnn_row(crop, crop_colors, "Crop", titles = TRUE),
-  plot_nnn_row(addition, addition_colors, "Addition"),
-  plot_nnn_row(treatment, fertilization_colors, "N Rate", xaxis = TRUE),
+  plot_nnn_row(Crop, crop_colors, "Crop", titles = TRUE),
+  plot_nnn_row(Addition, addition_colors, "Addition"),
+  plot_nnn_row(Treatment, fertilization_colors, "N Rate", xaxis = TRUE),
   nrow = 3
 )
 
@@ -210,15 +195,106 @@ plot_armn_row <- function(voi, palette, label, titles = FALSE, xaxis = FALSE) {
 }
 
 wrap_plots(
-  plot_armn_row(crop, crop_colors, "Crop", titles = TRUE),
-  plot_armn_row(addition, addition_colors, "Addition"),
-  plot_armn_row(treatment, fertilization_colors, "N rate", xaxis = TRUE),
+  plot_armn_row(Crop, crop_colors, "Crop", titles = TRUE),
+  plot_armn_row(Addition, addition_colors, "Addition"),
+  plot_armn_row(Treatment, fertilization_colors, "N rate", xaxis = TRUE),
   nrow = 3
 )
 
 ggsave(
   "figures/mineralization/net_min_nitr_abs_rel.png",
   width = 4300,
+  height = 3000,
+  units = "px",
+)
+
+####################### Looking at priming effects
+plot_addition_mineralization <- function(voi, net_min_var, x_label = "", y_label = "", zero_line = FALSE) {
+  this_dodge <- position_dodge(width = 0.1)
+
+  data_df <- mineralization_data %>%
+    group_by(Day, Addition, {{ voi }}) %>%
+    summarize(
+      mean_n = mean({{ net_min_var }}),
+      sd = sd({{ net_min_var }}),
+      se = sd({{ net_min_var }}) / sqrt(n())
+    ) %>%
+    ungroup()
+
+  p <- data_df %>%
+    ggplot(aes(Day, mean_n, fill = Addition, group = Addition, shape = Addition))
+
+  if (zero_line) {
+    p <- p + geom_hline(yintercept = 0, linetype = "dashed", color = "#848884")
+  }
+
+  p <- p +
+    geom_errorbar(
+      aes(ymin = mean_n - se, ymax = mean_n + se),
+      width = 1,
+      position = this_dodge
+    ) +
+    geom_line() +
+    geom_point(size = 4, position = this_dodge) +
+    scale_fill_manual(values = addition_colors) +
+    scale_shape_manual(values = c(21, 22, 23)) +
+    scale_x_continuous(breaks = day_breaks) +
+    theme(
+      panel.border = element_rect(color = "black", fill = NA),
+      aspect.ratio = 1
+    ) +
+    labs(
+      x = x_label,
+      y = y_label,
+      fill = "Addition",
+      shape = "Addition"
+    ) +
+    facet_wrap(formula(paste("~", enquo(voi))))
+
+  return(p)
+}
+
+plot_addition_mineralization_grid <- function(voi) {
+  plot_addition_mineralization(
+    {{ voi }}, net_min_rate_abs,
+    y = "Net mineralization rate (abs.)",
+    zero_line = TRUE
+  ) +
+    plot_addition_mineralization(
+      {{ voi }}, net_min_rate_rel,
+      y = "Net mineralization rate (rel.)",
+      zero_line = TRUE
+    ) +
+    plot_addition_mineralization(
+      {{ voi }}, net_nitr_rate_abs,
+      y = "Net nitrification rate (abs.)",
+      zero_line = TRUE
+    ) +
+    plot_addition_mineralization(
+      {{ voi }}, net_nitr_rate_rel,
+      y = "Net nitrification rate (rel.)",
+      zero_line = TRUE
+    ) +
+    plot_layout(
+      ncol = 1,
+      guides = "collect"
+    )
+}
+
+plot_addition_mineralization_grid(Crop)
+
+ggsave(
+  "figures/mineralization/addition_crop_min_effects.png",
+  width = 2000,
+  height = 3000,
+  units = "px",
+)
+
+plot_addition_mineralization_grid(Treatment)
+
+ggsave(
+  "figures/mineralization/addition_treatment_min_effects.png",
+  width = 2000,
   height = 3000,
   units = "px",
 )

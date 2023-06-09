@@ -92,3 +92,60 @@ write.csv(
     row.names = FALSE,
     quote = FALSE
 )
+
+########## Tukey HSD
+# Helper function to run Tukey HSD tests on N data
+get_tukey_results <- function(n_vars, n_df) {
+    results <- data.frame(
+        term = character(),
+        contrast = character(),
+        null.value = numeric(),
+        estimate = numeric(),
+        conf.low = numeric(),
+        conf.high = numeric(),
+        adj.p.value = numeric(),
+        n_var = character()
+    )
+
+    for (n_var in n_vars) {
+        anova_model <- aov(
+            as.formula(paste(n_var, "~ Crop * Addition * Treatment * Day")),
+            data = n_df
+        )
+
+        these_tukey_results <- TukeyHSD(anova_model) %>%
+            broom::tidy() %>%
+            mutate(n_var = n_var)
+
+        results <- bind_rows(results, these_tukey_results)
+    }
+
+    results <- results %>%
+        mutate(adj.p.value = round(adj.p.value, 3)) %>%
+        select(term, contrast, estimate, adj.p.value, n_var)
+
+    return(results)
+}
+
+n2o_vars <- c("N2ON_flux_ug_g_d", "cum_N2O_flux_ug_g")
+n2o_tukey <- get_tukey_results(n2o_vars, n2o_data)
+
+co2_vars <- c("CO2_flux_ug_g_d", "cum_CO2_flux_ug_g")
+co2_tukey <- get_tukey_results(co2_vars, co2_data)
+
+inorganic_n_vars <- c(
+    "no3n_mg_kg_1", "cum_no3", "nh4n_mg_kg_1", "cum_nh4",
+    "net_min_rate_rel", "net_min_rate_abs",
+    "net_nitr_rate_rel", "net_nitr_rate_abs"
+)
+
+inorganic_n_tukey <- get_tukey_results(inorganic_n_vars, nh4_no3_min_data)
+
+tukey_results_long <- bind_rows(n2o_tukey, co2_tukey, inorganic_n_tukey)
+
+write.csv(
+    tukey_results_long,
+    here::here("results/stats/n_tukey_results.long.csv"),
+    row.names = FALSE,
+    quote = FALSE
+)

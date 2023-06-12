@@ -289,3 +289,129 @@ ggsave(
     height = 4000,
     units = "px"
 )
+
+##################
+plot_addition_cum_factor_grid_plant <- function(foi, plant_type) {
+    plot_addition_lines_over_time(
+        n2o_data %>% filter(Crop == plant_type), {{ foi }}, cum_N2O_flux_ug_g,
+        y_label = make_cumulative_label(n2o_label),
+        show_legend = FALSE, show_strip_title = TRUE
+    ) +
+        plot_addition_lines_over_time(
+            co2_data %>% filter(Crop == plant_type), {{ foi }}, cum_CO2_flux_ug_g,
+            y_label = paste0("Cumulative ", co2_label, " (mg C kg<sup>-1</sup> soil)"),
+            show_legend = FALSE
+        ) +
+        plot_addition_lines_over_time(
+            nh4_no3_min_data %>% filter(Crop == plant_type), {{ foi }}, cum_no3,
+            y_label = make_cumulative_label(nitrate_label),
+            show_legend = FALSE
+        ) +
+        plot_addition_lines_over_time(
+            nh4_no3_min_data %>% filter(Crop == plant_type), {{ foi }}, cum_nh4,
+            y_label = make_cumulative_label(ammonia_label)
+        ) +
+        plot_layout(ncol = 1, guides = "collect")
+}
+
+plot_addition_cum_factor_grid_plant(Treatment, "Miscanthus")
+
+ggsave(
+    here::here("figures/n_figures/addition_by_crop/n_line_addition_nrate_cumulative_miscanthus.png"),
+    width = 2700,
+    height = 4000,
+    units = "px"
+)
+
+plot_addition_cum_factor_grid_plant(Treatment, "Corn")
+
+ggsave(
+    here::here("figures/n_figures/addition_by_crop/n_line_addition_nrate_cumulative_corn.png"),
+    width = 2700,
+    height = 4000,
+    units = "px"
+)
+
+
+###################### PE plots
+# These will focus on end-of-experiment cumulative measurements.
+# Because there are only 4 points in each slice, we'll just plot the points with error bars.
+plot_eoe_pe_boxplot <- function(n_df, final_day, n_var) {
+    n_df %>%
+        filter(Day == final_day) %>%
+        group_by(Crop, Treatment, Addition) %>%
+        ggplot(aes(Addition, {{ n_var }}, fill = Addition)) +
+        geom_violin() +
+        facet_grid(Crop ~ Treatment) +
+        scale_fill_manual(values = addition_colors)
+}
+
+plot_eoe_pe_boxplot(n2o_data, 144, N2ON_flux_ug_g_d)
+
+plot_eoe_pe_errors <- function(n_df, final_day, n_var, y_label) {
+    n_df %>%
+        filter(Day == final_day) %>%
+        group_by(Crop, Treatment, Addition) %>%
+        mutate(
+            mean_n = mean({{ n_var }}),
+            sd_n = sd({{ n_var }}),
+            se_n = sd_n / sqrt(n())
+        ) %>%
+        ggplot(aes(Addition, mean_n, fill = Addition, shape = Addition)) +
+        geom_errorbar(
+            aes(ymin = mean_n - se_n, ymax = mean_n + se_n),
+            width = 0.5,
+        ) +
+        # geom_boxplot() +
+        geom_point(size = 4) +
+        facet_grid(Crop ~ Treatment) +
+        scale_fill_manual(values = addition_colors) +
+        scale_shape_manual(values = c(21, 22, 23)) +
+        theme(
+            axis.text.x = element_markdown(size = 12),
+            axis.title.y = element_markdown()
+        ) +
+        labs(
+            x = "",
+            y = y_label
+        )
+}
+
+eoe_pe_errors_width <- 2900
+eoe_pe_errors_height <- 2200
+
+plot_eoe_pe_errors(n2o_data, 144, cum_N2O_flux_ug_g, make_cumulative_label(n2o_label))
+
+ggsave(
+    here::here("figures/n_figures/pes/n2o_pe.png"),
+    width = eoe_pe_errors_width,
+    height = eoe_pe_errors_height,
+    units = "px"
+)
+
+plot_eoe_pe_errors(co2_data, 146, cum_CO2_flux_ug_g, make_cumulative_label(co2_label, chem_var = "C"))
+
+ggsave(
+    here::here("figures/n_figures/pes/co2_pe.png"),
+    width = eoe_pe_errors_width,
+    height = eoe_pe_errors_height,
+    units = "px"
+)
+
+plot_eoe_pe_errors(nh4_no3_min_data, 144, cum_no3, make_cumulative_label(nitrate_label))
+
+ggsave(
+    here::here("figures/n_figures/pes/no3_pe.png"),
+    width = eoe_pe_errors_width,
+    height = eoe_pe_errors_height,
+    units = "px"
+)
+
+plot_eoe_pe_errors(nh4_no3_min_data, 144, cum_nh4, make_cumulative_label(ammonia_label))
+
+ggsave(
+    here::here("figures/n_figures/pes/nh4_pe.png"),
+    width = eoe_pe_errors_width,
+    height = eoe_pe_errors_height,
+    units = "px"
+)

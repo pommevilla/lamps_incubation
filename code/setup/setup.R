@@ -21,7 +21,9 @@ theme_set(
       panel.border = element_rect(color = "black", fill = NA),
       text = element_text(family = "Times New Roman"),
       plot.title = element_markdown(hjust = 0.5),
-      plot.subtitle = element_markdown(hjust = 0.5)
+      plot.subtitle = element_markdown(hjust = 0.5),
+      strip.background = element_rect(color = "black", fill = "#C6C6C6"),
+      strip.text = element_markdown(color = "black", size = 12),
     )
 )
 
@@ -105,7 +107,8 @@ n2o_label <- "N<sub>2</sub>O"
 mineralization_variables <- c(
   "net_min_rate_rel", "net_min_rate_abs",
   "net_nitr_rate_rel", "net_nitr_rate_abs",
-  "no3n_mg_kg_1", "nh4n_mg_kg_1"
+  "no3n_mg_kg_1", "nh4n_mg_kg_1",
+  "cum_no3", "cum_nh4"
 )
 
 # CO2 variables in co2_data
@@ -189,4 +192,12 @@ make_inorganic_n_label <- function(inorg_n_var, cumulative = FALSE) {
   }
 
   return(inorg_n_lab)
+}
+
+make_cumulative_label <- function(n_var, chem_var = "N") {
+  paste0("Cumulative ", n_var, " (mg ", chem_var, " kg<sup>-1</sup> soil)")
+}
+
+calc_percentage <- function(new_number, baseline) {
+  (new_number - baseline) / baseline * 100
 }

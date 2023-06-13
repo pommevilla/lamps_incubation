@@ -88,13 +88,6 @@ summarise_addition_at_day <- function(n_df, voi, sum_day, vars) {
     return(sum_df)
 }
 
-n2o_data %>%
-    filter(Day == 144) %>%
-    group_by(Addition, Treatment) %>%
-    summarise(
-        mean_n = mean(cum_N2O_flux_ug_g),
-    )
-
 summarise_addition_in_treatment_at_day <- function(voi) {
     co2_means <- summarise_addition_at_day(co2_data, {{ voi }}, 146, co2_vars)
     n2o_means <- summarise_addition_at_day(n2o_data, {{ voi }}, 144, n2o_vars)
@@ -118,6 +111,48 @@ write.csv(
 )
 
 
+############## Summarise addition effects by crop in N rate
+summarise_crop_addition_at_day <- function(n_df, sum_day, vars) {
+    sum_df <- n_df %>%
+        filter(Day == sum_day) %>%
+        group_by(Crop, Addition, Treatment) %>%
+        summarise(across(
+            any_of(vars),
+            list(
+                mean = mean,
+                sd = sd
+            ),
+            .names = "{.col}_{.fn}"
+        )) %>%
+        ungroup() %>%
+        unite("level", Addition, Treatment, sep = " ") %>%
+        pivot_longer(-(1:2))
+    # %>%
+    # mutate(Crop = plant_type, .before = 1)
+
+    return(sum_df)
+}
+
+summarise_crop_addition_in_treatment_at_day <- function() {
+    co2_means <- summarise_crop_addition_at_day(co2_data, 146, co2_vars)
+    n2o_means <- summarise_crop_addition_at_day(n2o_data, 144, n2o_vars)
+    inorganic_n_means <- summarise_crop_addition_at_day(nh4_no3_min_data, 144, mineralization_variables)
+
+    bind_rows(
+        co2_means, n2o_means, inorganic_n_means
+    )
+}
+
+crop_addition_treatment_eoe_summaries <- summarise_crop_addition_in_treatment_at_day()
+
+write.csv(
+    crop_addition_treatment_eoe_summaries,
+    here::here("results/eoe_summaries/crop_addition_treatment_eoe_summaries.csv"),
+    row.names = FALSE,
+    quote = FALSE
+)
+
+
 ############## Tukey HSD results exploring
 tukey_results %>%
     select(term, contrast, estimate, adj.p.value, n_var) %>%
@@ -126,10 +161,6 @@ tukey_results %>%
     # filter(n_var == "cum_N2O_flux_ug_g") %>%
     # filter(contrast == "Nitrogen:146-Carbon:146")
     filter(str_detect(contrast, "146"))
-
-
-
-
 
 ############## Priming Effects
 cumulative_emissions_pe %>%
@@ -141,7 +172,25 @@ cumulative_emissions_pe %>%
 tukey_results %>%
     select(term, contrast, estimate, adj.p.value, n_var) %>%
     filter(term == "Addition:Treatment:Day") %>%
-    filter(n_var == "cum_CO2_flux_ug_g") %>%
     separate(contrast, into = c("contrast_1", "contrast_2"), sep = "-") %>%
     filter(str_detect(contrast_1, "146") & str_detect(contrast_2, "146")) %>%
     filter(str_detect(contrast_1, "0N") & str_detect(contrast_2, "0N"))
+
+
+tukey_results %>%
+    filter(term == "Crop:Addition:Treatment:Day") %>%
+    separate(contrast, into = c("contrast_1", "contrast_2"), sep = "-") %>%
+    filter(n_var == "cum_nh4") %>%
+    # filter(str_detect(contrast_1, "146") & str_detect(contrast_2, "146"))
+    filter(str_detect(contrast_1, "144") & str_detect(contrast_2, "144")) %>%
+    filter(str_detect(contrast_1, "0N") & str_detect(contrast_2, "0N")) %>%
+    # filter(str_detect(contrast_1, "Corn") & str_detect(contrast_2, "Corn"))
+    filter(str_detect(contrast_1, "Miscanthus") & str_detect(contrast_2, "Miscanthus"))
+########################
+n2o_data %>%
+    filter(Day == 144) %>%
+    group_by(Crop, Treatment, Addition) %>%
+    summarise(across(
+        any_of(contains("N2O")),
+        list(mean = mean)
+    ))

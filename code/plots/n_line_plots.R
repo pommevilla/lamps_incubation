@@ -336,45 +336,34 @@ ggsave(
 ###################### PE plots
 # These will focus on end-of-experiment cumulative measurements.
 # Because there are only 4 points in each slice, we'll just plot the points with error bars.
-plot_eoe_pe_boxplot <- function(n_df, final_day, n_var) {
-    n_df %>%
-        filter(Day == final_day) %>%
-        group_by(Crop, Treatment, Addition) %>%
-        ggplot(aes(Addition, {{ n_var }}, fill = Addition)) +
-        geom_violin() +
-        facet_grid(Crop ~ Treatment) +
-        scale_fill_manual(values = addition_colors)
-}
-
-plot_eoe_pe_boxplot(n2o_data, 144, N2ON_flux_ug_g_d)
-
 plot_eoe_pe_errors <- function(n_df, final_day, n_var, y_label) {
     n_df %>%
         filter(Day == final_day) %>%
         group_by(Crop, Treatment, Addition) %>%
-        mutate(
+        summarise(
             mean_n = mean({{ n_var }}),
             sd_n = sd({{ n_var }}),
             se_n = sd_n / sqrt(n())
-        ) %>%
-        ggplot(aes(Addition, mean_n, fill = Addition, shape = Addition)) +
-        geom_errorbar(
-            aes(ymin = mean_n - se_n, ymax = mean_n + se_n),
-            width = 0.5,
-        ) +
-        # geom_boxplot() +
-        geom_point(size = 4) +
-        facet_grid(Crop ~ Treatment) +
-        scale_fill_manual(values = addition_colors) +
-        scale_shape_manual(values = c(21, 22, 23)) +
-        theme(
-            axis.text.x = element_markdown(size = 12),
-            axis.title.y = element_markdown()
-        ) +
-        labs(
-            x = "",
-            y = y_label
         )
+    # %>%
+    # ggplot(aes(Addition, mean_n, fill = Addition, shape = Addition)) +
+    # geom_errorbar(
+    #     aes(ymin = mean_n - se_n, ymax = mean_n + se_n),
+    #     width = 0.5,
+    # ) +
+    # # geom_boxplot() +
+    # geom_point(size = 4) +
+    # facet_grid(Crop ~ Treatment) +
+    # scale_fill_manual(values = addition_colors) +
+    # scale_shape_manual(values = c(21, 22, 23)) +
+    # theme(
+    #     axis.text.x = element_markdown(size = 12),
+    #     axis.title.y = element_markdown()
+    # ) +
+    # labs(
+    #     x = "",
+    #     y = y_label
+    # )
 }
 
 eoe_pe_errors_width <- 2900
@@ -400,6 +389,15 @@ ggsave(
 
 plot_eoe_pe_errors(nh4_no3_min_data, 144, cum_no3, make_cumulative_label(nitrate_label))
 
+nh4_no3_min_data %>%
+    filter(Day == 144) %>%
+    group_by(Crop, Treatment, Addition) %>%
+    summarise(
+        mean_n = mean(cum_no3),
+        sd_n = sd(cum_no3),
+        se_n = sd_n / sqrt(n())
+    )
+
 ggsave(
     here::here("figures/n_figures/pes/no3_pe.png"),
     width = eoe_pe_errors_width,
@@ -415,3 +413,10 @@ ggsave(
     height = eoe_pe_errors_height,
     units = "px"
 )
+
+nh4_no3_min_data %>%
+    filter(Day == 144) %>%
+    group_by(Crop, Treatment, Addition) %>%
+    summarise(
+        mean_n = mean(cum_no3)
+    )

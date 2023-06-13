@@ -128,6 +128,7 @@ qpcr_variables <- c(
   "ave_sum", "log_sum",
   "norB.001", "log_norB.001",
   "norB.006", "log_norB.006",
+  "norB.039", "log_norB.039",
   "norB.sum", "log_norB.sum",
   "cnorB", "log_cnorB"
 )

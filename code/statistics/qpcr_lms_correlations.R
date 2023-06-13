@@ -15,7 +15,7 @@ qpcr_min_data <- read.csv("data/prepped_data/mineralization_and_qpcr_data.csv") 
 # Variables for the for loops
 n_variables <- c(
     mineralization_variables,
-    "N2ON_flux_ug_g_d"
+    n2o_vars
 )
 
 grouping_variables <- c("Treatment", "Crop", "Addition")
@@ -42,11 +42,11 @@ for (group_var in grouping_variables) {
     # correlations of the qpcr_var against the n_var for each factor
     # level of the grouping variable.
     for (qpcr_var in qpcr_variables) {
+        print(paste("Running", qpcr_var))
         for (n_var in n_variables) {
-
             # This will run a linear regression of qpcr_var ~ n_var for each
             # factor level and record the r^2 and p-value in the result df.
-            print("Running linear regression...")
+            # print("Running linear regression...")
             model_formula <- as.formula(paste(qpcr_var, "~", n_var))
             lm_result <- grouped_data %>%
                 do(broom::tidy(lm(model_formula, data = .)))
@@ -69,7 +69,7 @@ for (group_var in grouping_variables) {
                     )
             }
 
-            print("Running correlations...")
+            # print("Running correlations...")
             for (cor_type in c("pearson", "spearman")) {
                 cors <- grouped_data %>%
                     summarise(out = as_tibble(
@@ -102,11 +102,11 @@ for (group_var in grouping_variables) {
 }
 
 # Sanity check:
-#    18 qpcr variables
-#  *  7 n variables
+#    20 qpcr variables
+#  *  10 n variables
 #  *  (2 + 3 + 3) grouping variables
 #  *  3 statistics
-#  = 3024 rows
+#  = 4800 rows
 result_df <- result_df %>%
     mutate(across(
         estimate:p_value,

@@ -34,7 +34,10 @@ run_anovas <- function(lhs_vars, n_df, rhs_formula = "~ Crop * Addition * Treatm
         bind_rows() %>%
         filter(term != "Residuals") %>%
         mutate(sig = get_p_sig(p.value)) %>%
-        mutate(p.value = round(p.value, 3)) %>%
+        mutate(across(
+            sumsq:p.value,
+            ~ round(., 3)
+        )) %>%
         mutate(order = str_count(term, ":")) %>%
         mutate(term = fct_reorder(term, order))
 
@@ -46,7 +49,7 @@ anova_results_long <- run_anovas(qpcr_variables, qpcr_data)
 
 write.csv(
     anova_results_long,
-    here::here("results/stats", "qpcr_anova_results_long.csv"),
+    here::here("results/stats/qpcr_anova_results_long.csv"),
     row.names = FALSE,
     quote = FALSE
 )
@@ -62,3 +65,70 @@ write.csv(
     row.names = FALSE,
     quote = FALSE
 )
+
+# Visually inspecting for normality
+# Untransformed values appear to mostly be normally distributed,
+qpcr_data %>%
+    pivot_longer(
+        any_of(qpcr_variables)
+    ) %>%
+    mutate(
+        nor = if_else(
+            str_detect(name, "log"),
+            "logged",
+            "non_logged",
+        )
+    ) %>%
+    ggplot(aes(value)) +
+    geom_histogram() +
+    facet_grid(nor ~ name, scales = "free")
+
+#################### Tukey results
+get_tukey_results <- function(qpcr_vars, n_df) {
+    results <- data.frame(
+        term = character(),
+        contrast = character(),
+        null.value = numeric(),
+        estimate = numeric(),
+        conf.low = numeric(),
+        conf.high = numeric(),
+        adj.p.value = numeric(),
+        gene_var = character()
+    )
+
+    for (qpcr_var in qpcr_vars) {
+        anova_model <- aov(
+            as.formula(paste(qpcr_var, "~ Crop * Addition * Treatment * Day")),
+            data = n_df
+        )
+
+        these_tukey_results <- TukeyHSD(anova_model) %>%
+            broom::tidy() %>%
+            mutate(qpcr_var = qpcr_var)
+
+        results <- bind_rows(results, these_tukey_results)
+    }
+
+    results <- results %>%
+        mutate(adj.p.value = round(adj.p.value, 3)) %>%
+        select(term, contrast, estimate, adj.p.value, qpcr_var)
+
+    return(results)
+}
+
+qpcr_tukey <- get_tukey_results(qpcr_variables, qpcr_data) %>%
+    separate(contrast, into = c("contrast_1", "contrast_2"), sep = "-")
+
+write.csv(
+    qpcr_tukey,
+    here::here("results/stats/qpcr_tukey_results.csv"),
+    row.names = FALSE,
+    quote = FALSE
+)
+
+################## Exploring Tukey results
+qpcr_tukey %>%
+    head()
+
+aov(norB.001 ~ Crop * Addition * Treatment * Day, data = qpcr_data) %>%
+    summary()

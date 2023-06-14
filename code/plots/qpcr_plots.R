@@ -169,8 +169,7 @@ calc_rel_abundance <- function(qpcr_df, plot_vars, baseline_qpcr, gene) {
 
   avg_qpcr_numbers <- avg_qpcr_numbers %>%
     mutate(
-      how_much_more = round(mean / baseline_abundance, 1),
-      how_much_more = paste0(how_much_more, "x"),
+      perc_diff = round(calc_percentage(mean, baseline_abundance), 1),
       rel_abund = mean / sum(mean)
     ) %>%
     mutate(
@@ -199,9 +198,9 @@ plot_rel_abundances <- function(abundance_df) {
     geom_label(
       inherit.aes = FALSE,
       data = abundance_df %>% filter(baseline != "baseline"),
-      aes(x = name, y = mean, label = how_much_more),
+      aes(x = name, y = mean, label = paste0(perc_diff, "%")),
       nudge_y = -0.5e8,
-      size = 2
+      size = 3
     ) +
     labs(
       x = "",
@@ -270,8 +269,8 @@ plot_addition_qpcr_in_group <- function(voi, plot_vars, free_y = FALSE, y_label 
     theme(
       panel.border = element_rect(color = "black", fill = NA),
       aspect.ratio = 1,
-      strip.text = element_markdown(color = "black", size = 12),
-      strip.background = element_rect(color = "black", fill = "#C6C6C6"),
+      # strip.text = element_markdown(color = "black", size = 12),
+      # strip.background = element_rect(color = "black", fill = "#C6C6C6"),
       axis.title.y = element_markdown(size = 12)
     ) +
     labs(

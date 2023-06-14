@@ -169,11 +169,11 @@ calc_rel_abundance <- function(qpcr_df, plot_vars, baseline_qpcr, gene) {
 
   avg_qpcr_numbers <- avg_qpcr_numbers %>%
     mutate(
-      perc_diff = round(calc_percentage(mean, baseline_abundance), 1),
+      perc_diff = round(calc_percentage(mean, baseline_abundance), 0),
       rel_abund = mean / sum(mean)
     ) %>%
     mutate(
-      gene = gene,
+      gene = italicize_gene(gene),
       baseline = if_else(name == baseline_qpcr, "baseline", "not baseline"),
       name = factor(name, levels = plot_vars, labels = make_nice_qpcr_names(plot_vars))
     )
@@ -226,7 +226,7 @@ plot_rel_abundances <- function(abundance_df) {
 }
 
 plot_rel_abundances(combined_abundances) +
-  labs(y = paste0(gcn_unit, "<br>(abundance rel. to classic primers in label)"))
+  labs(y = paste0(gcn_unit, "<br>(label: % amplifed relative to existing primers)"))
 
 ggsave(
   here::here("figures/qpcr/qpcr_rel_abundances_barchart.png"),

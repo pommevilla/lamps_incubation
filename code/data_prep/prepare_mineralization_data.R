@@ -24,10 +24,10 @@ mineralization_data <- read_xlsx("data/FILE_4247_sjh.xlsx", sheet = "Sheet1") %>
   separate(rev_name, c("sample", "timepoint"), sep = -1, remove = FALSE)
 
 ################## Calculate Net N mineralization
-# Net N mineralization is calculated via taking the difference in the sum of
-# nitrate and ammonium between two days, divided by the length of time
-# between the two measurements. For example, to calculate the net M
-# mineralization between days 32 and 5, we would use:
+# Net N mineralization is calculated by taking the difference in the sum of
+# nitrate and ammonium (total inorganic N) between the two days and dividing
+# by the length of time # between the two measurements.
+# For example, to calculate the net M mineralization between days 32 and 5, we would use:
 # [(Day 32-NO3N_mg.kg + Day 32-NH4N.mg.kg) - (Day 5-NO3N_mg.kg + Day 5-NH4N.mg.kg)] / (32-5)
 # We calculate two versions - one relative to the previous measurement (as above) called
 # net_min_rate_rel, and one relative to the first measurement called net_min_rate_abs.
@@ -80,6 +80,8 @@ write.csv(
   row.names = FALSE,
   quote = FALSE
 )
+
+mineralization_data <- read.csv("data/prepped_data/mineralization_data.csv")
 
 ################## Join with qPCR data
 # We'll join the qPCR data with the mineralization data and save it separately

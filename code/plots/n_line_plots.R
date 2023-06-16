@@ -344,26 +344,25 @@ plot_eoe_pe_errors <- function(n_df, final_day, n_var, y_label) {
             mean_n = mean({{ n_var }}),
             sd_n = sd({{ n_var }}),
             se_n = sd_n / sqrt(n())
+        ) %>%
+        ggplot(aes(Addition, mean_n, fill = Addition, shape = Addition)) +
+        geom_errorbar(
+            aes(ymin = mean_n - se_n, ymax = mean_n + se_n),
+            width = 0.5,
+        ) +
+        # geom_boxplot() +
+        geom_point(size = 4) +
+        facet_grid(Crop ~ Treatment) +
+        scale_fill_manual(values = addition_colors) +
+        scale_shape_manual(values = c(21, 22, 23)) +
+        theme(
+            axis.text.x = element_markdown(size = 12),
+            axis.title.y = element_markdown()
+        ) +
+        labs(
+            x = "",
+            y = y_label
         )
-    # %>%
-    # ggplot(aes(Addition, mean_n, fill = Addition, shape = Addition)) +
-    # geom_errorbar(
-    #     aes(ymin = mean_n - se_n, ymax = mean_n + se_n),
-    #     width = 0.5,
-    # ) +
-    # # geom_boxplot() +
-    # geom_point(size = 4) +
-    # facet_grid(Crop ~ Treatment) +
-    # scale_fill_manual(values = addition_colors) +
-    # scale_shape_manual(values = c(21, 22, 23)) +
-    # theme(
-    #     axis.text.x = element_markdown(size = 12),
-    #     axis.title.y = element_markdown()
-    # ) +
-    # labs(
-    #     x = "",
-    #     y = y_label
-    # )
 }
 
 eoe_pe_errors_width <- 2900
@@ -420,3 +419,56 @@ nh4_no3_min_data %>%
     summarise(
         mean_n = mean(cum_no3)
     )
+
+plot_eoe_pe_errors(
+    nh4_no3_min_data, 144, net_min_rate_abs,
+    "Net mineralization rate (mg N kg<sup>-1</sup> soil d<sup>-1</sup>)"
+)
+
+ggsave(
+    here::here("figures/n_figures/pes/net_min_pe.png"),
+    width = eoe_pe_errors_width,
+    height = eoe_pe_errors_height,
+    units = "px"
+)
+
+
+################# For the dissertation
+plot_n2o_co2_min_by_ <- function(foi, palette, show_titles = FALSE) {
+    p1 <- plot_lines_over_time(
+        n2o_data, {{ foi }}, cum_N2O_flux_ug_g, palette,
+        plot_title = "", show_legend = FALSE,
+        y_label = make_cumulative_label(n2o_label)
+    )
+
+    p2 <- plot_lines_over_time(
+        co2_data, {{ foi }}, cum_CO2_flux_ug_g, palette,
+        plot_title = , show_legend = FALSE,
+        y_label = make_cumulative_label(co2_label, chem_var = "C")
+    )
+
+    p3 <- plot_lines_over_time(
+        nh4_no3_min_data, {{ foi }}, net_min_rate_abs, palette,
+        plot_title = "",
+        y_label = paste0(inorganic_n_units, " day<sup>-1</sup>")
+    )
+
+    if (show_titles) {
+        p1 <- p1 + labs(title = n2o_label)
+        p2 <- p2 + labs(title = co2_label)
+        p3 <- p3 + labs(title = "Net mineralization rate")
+    }
+
+    p1 + p2 + p3
+}
+
+plot_n2o_co2_min_by_(Crop, crop_colors, show_titles = TRUE) /
+    plot_n2o_co2_min_by_(Addition, addition_colors) /
+    plot_n2o_co2_min_by_(Treatment, fertilization_colors)
+
+ggsave(
+    here::here("figures/n_figures/n_line_plots_dissertation.png"),
+    width = 4000,
+    height = 3000,
+    units = "px"
+)

@@ -390,10 +390,13 @@ qpcr_data %>%
   ) %>%
   ggplot(aes(name, diff, fill = Crop)) +
   geom_col() +
+  geom_hline(yintercept = 0, color = "black", size = 1) +
   theme(
     panel.border = element_blank(),
-    axis.line.x = element_line(),
-    axis.text.x = element_markdown(),
+    axis.text.x = element_markdown(size = 12),
+    axis.text.y = element_markdown(size = 14),
+    axis.title.y = element_markdown(size = 14),
+    axis.ticks = element_blank(),
     panel.grid.major.y = element_line(color = "gray", linetype = "dashed"),
   ) +
   scale_y_continuous(
@@ -405,3 +408,10 @@ qpcr_data %>%
     x = "",
     y = "% difference"
   )
+
+ggsave(
+  here::here("figures/qpcr/amoa_diff_by_crop.png"),
+  width = 3000,
+  height = 1900,
+  units = "px"
+)

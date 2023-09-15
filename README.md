@@ -10,8 +10,8 @@ Project repo for analysis done on the crop priming data for the LAMPS incubation
 * `figures`
     * `n_figures`
         * [`n_line_plots.png`](figures/n_figures/n_line_plots.png) - daily GHG and N by treatment.
-        * ['n_line_plots_cumulative.png'](figures/n_figures/n_line_plots_cumulative.png) - cumulative GHG and N by treatment.
-        * [net_min_nitr_abs_rel.png](figures/n_figures/net_min_nitr_abs_rel.png) - nitrification and mineralization rates (relative to previous sample and relative to initial sample) by treatment.
+        * [`n_line_plots_cumulative.png`](figures/n_figures/n_line_plots_cumulative.png) - cumulative GHG and N by treatment.
+        * [`net_min_nitr_abs_rel.png`](figures/n_figures/net_min_nitr_abs_rel.png) - nitrification and mineralization rates (relative to previous sample and relative to initial sample) by treatment.
 
 ## Repeating the analysis
 

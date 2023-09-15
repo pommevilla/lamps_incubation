@@ -194,3 +194,26 @@ n2o_data %>%
         any_of(contains("N2O")),
         list(mean = mean)
     ))
+
+
+######################## Repeat for mineralization rates at days 4 and 15
+
+all_inorganic_n_summaries <- nh4_no3_min_data %>%
+    group_by(Crop, Addition, Treatment, Day) %>%
+    summarise(across(
+        any_of(mineralization_variables),
+        list(
+            mean = mean,
+            sd = sd
+        ),
+        .names = "{.col}_{.fn}"
+    )) %>%
+    ungroup() %>%
+    pivot_longer(-(1:4))
+
+write.csv(
+    all_inorganic_n_summaries,
+    here::here("results/eoe_summaries/all_inorganic_pe_summaries.csv"),
+    row.names = FALSE,
+    quote = FALSE
+)

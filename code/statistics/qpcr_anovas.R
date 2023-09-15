@@ -128,7 +128,24 @@ write.csv(
 
 ################## Exploring Tukey results
 qpcr_tukey %>%
+    filter(str_detect(contrast_1, "144") & str_detect(contrast_2, "144")) %>%
     head()
 
 aov(norB.001 ~ Crop * Addition * Treatment * Day, data = qpcr_data) %>%
     summary()
+
+qpcr_tukey %>%
+    filter(!str_detect(qpcr_var, "nor")) %>%
+    filter(!str_detect(qpcr_var, "log")) %>%
+    filter(term == "Treatment:Day") %>%
+    filter(str_detect(contrast_1, "32") & str_detect(contrast_2, "32"))
+# filter(str_detect(contrast_1, "5k") & str_detect(contrast_2, "5"))
+
+qpcr_data %>%
+    select(-contains("log")) %>%
+    group_by(Crop) %>%
+    summarise(across(
+        any_of(qpcr_variables),
+        list(mean = mean)
+    )) %>%
+    view()

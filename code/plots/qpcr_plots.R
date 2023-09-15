@@ -236,6 +236,50 @@ ggsave(
 )
 
 
+########## By crop type for dissertation
+calc_rel_abundance_by_crop <- function(qpcr_df, plot_vars, baseline_qpcr, gene) {
+  avg_qpcr_numbers <- qpcr_df %>%
+    select(Crop, any_of(plot_vars)) %>%
+    pivot_longer(-Crop) %>%
+    group_by(name, Crop) %>%
+    summarise(
+      mean = mean(value),
+      sd = sd(value),
+      se = sd / sqrt(n())
+    )
+
+  baseline_abundance <- avg_qpcr_numbers %>%
+    filter(name == baseline_qpcr) %>%
+    pull(mean)
+
+  avg_qpcr_numbers <- avg_qpcr_numbers %>%
+    mutate(
+      perc_diff = round(calc_percentage(mean, baseline_abundance), 0),
+      rel_abund = mean / sum(mean)
+    ) %>%
+    mutate(
+      gene = italicize_gene(gene),
+      baseline = if_else(name == baseline_qpcr, "baseline", "not baseline"),
+      name = factor(name, levels = plot_vars, labels = make_nice_qpcr_names(plot_vars))
+    )
+
+  return(avg_qpcr_numbers)
+}
+
+norb_rel_abundances_by_crop <- calc_rel_abundance_by_crop(qpcr_data, ave_norb_qpcr_variables, "cnorB", "norB")
+amoa_rel_abundances_by_crop <- calc_rel_abundance_by_crop(qpcr_data, ave_amoa_qpcr_variables, "F1R2_ave", "amoA")
+
+
+
+norb_rel_abundances_by_crop %>%
+  ggplot(aes(name, mean)) +
+  geom_col() +
+  facet_grid(gene ~ Crop) +
+  theme(
+    strip.text.y = element_markdown(),
+    axis.text.x = element_markdown()
+  )
+
 ########## Plotting abundances by addition within N-rate/crop type
 plot_addition_qpcr_in_group <- function(voi, plot_vars, free_y = FALSE, y_label = gcn_unit, x_label = "Day") {
   this_dodge <- position_dodge(width = 0.1)
@@ -322,3 +366,42 @@ ggsave(
   height = 2600,
   units = "px"
 )
+
+######## For the dissertation
+qpcr_data %>%
+  filter(Day == 5) %>%
+  group_by(Crop) %>%
+  summarize(across(
+    any_of(ave_amoa_qpcr_variables),
+    list(mean = mean)
+  )) %>%
+  pivot_longer(-Crop) %>%
+  mutate(
+    name = str_replace_all(name, "_mean", ""),
+    name = make_nice_qpcr_names(name)
+  ) %>%
+  pivot_wider(
+    names_from = Crop,
+    values_from = value
+  ) %>%
+  mutate(diff = calc_percentage(Miscanthus, Corn)) %>%
+  mutate(
+    Crop = if_else(diff > 0, "Miscanthus", "Corn")
+  ) %>%
+  ggplot(aes(name, diff, fill = Crop)) +
+  geom_col() +
+  theme(
+    panel.border = element_blank(),
+    axis.line.x = element_line(),
+    axis.text.x = element_markdown(),
+    panel.grid.major.y = element_line(color = "gray", linetype = "dashed"),
+  ) +
+  scale_y_continuous(
+    expand = expansion(add = 0, mult = c(0, 0.1)),
+    labels = function(x) paste0(x, "%")
+  ) +
+  scale_fill_manual(values = crop_colors) +
+  labs(
+    x = "",
+    y = "% difference"
+  )

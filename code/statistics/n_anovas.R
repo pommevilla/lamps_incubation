@@ -76,7 +76,7 @@ anova_results_long <- bind_rows(
 
 write.csv(
     anova_results_long,
-    here::here("results/stats", "n_anova_results.long.csv"),
+    here::here("results/stats/n_anova_results.long.csv"),
     row.names = FALSE,
     quote = FALSE
 )
@@ -88,7 +88,7 @@ anova_results_wide <- anova_results_long %>%
 
 write.csv(
     anova_results_wide,
-    here::here("results/stats", "n_anova_results.wide.csv"),
+    here::here("results/stats/n_anova_results.wide.csv"),
     row.names = FALSE,
     quote = FALSE
 )
@@ -122,7 +122,8 @@ get_tukey_results <- function(n_vars, n_df) {
 
     results <- results %>%
         mutate(adj.p.value = round(adj.p.value, 3)) %>%
-        select(term, contrast, estimate, adj.p.value, n_var)
+        select(term, contrast, estimate, adj.p.value, n_var) %>%
+        separate(contrast, into = c("contrast_1", "contrast_2"), sep = "-")
 
     return(results)
 }

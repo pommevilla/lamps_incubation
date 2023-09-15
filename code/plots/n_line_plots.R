@@ -421,7 +421,7 @@ nh4_no3_min_data %>%
     )
 
 plot_eoe_pe_errors(
-    nh4_no3_min_data, 144, net_min_rate_abs,
+    nh4_no3_min_data, 4, net_min_rate_abs,
     "Net mineralization rate (mg N kg<sup>-1</sup> soil d<sup>-1</sup>)"
 )
 
@@ -432,6 +432,25 @@ ggsave(
     units = "px"
 )
 
+
+######## Net mineralization PEs for other days
+net_min_pe_days <- c(4, 15, 30, 86, 144)
+
+for (pe_day in net_min_pe_days) {
+    plot_eoe_pe_errors(
+        nh4_no3_min_data, pe_day, net_min_rate_abs,
+        paste0("Net mineralization rate (mg N kg<sup>-1</sup> soil d<sup>-1</sup>) at day ", pe_day)
+    )
+
+    this_file_name <- paste0("net_min_pe_", pe_day, ".png")
+
+    ggsave(
+        here::here("figures/n_figures/pes", this_file_name),
+        width = eoe_pe_errors_width,
+        height = eoe_pe_errors_height,
+        units = "px"
+    )
+}
 
 ################# For the dissertation
 plot_n2o_co2_min_by_ <- function(foi, palette, show_titles = FALSE) {

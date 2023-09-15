@@ -202,3 +202,12 @@ make_cumulative_label <- function(n_var, chem_var = "N") {
 calc_percentage <- function(new_number, baseline) {
   (new_number - baseline) / baseline * 100
 }
+
+italicize_gene <- function(gene_name) {
+  prefix <- substr(gene_name, 1, 3)
+  suffix <- substr(gene_name, 4, 4)
+
+  italicized_name <- str_glue("<i>{prefix}</i>{suffix}")
+
+  return(italicized_name)
+}

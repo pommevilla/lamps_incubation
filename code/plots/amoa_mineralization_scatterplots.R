@@ -16,9 +16,9 @@ mineralization_and_qpcr_data <- read.csv(here("data/prepped_data", "mineralizati
 # and plot that y variable against time. The optional zero line is to add a horizontal
 # line at x = 0.
 
-plot_amoa_min_scatter <- function(amoa_oi, min_voi, foi, palette, show_legend = FALSE) {
+plot_qpcr_n_scatter <- function(qpcr_oi, y_voi, foi, palette, show_legend = FALSE) {
   # Get info R^2 and significance for linear model
-  this_formula <- as.formula(paste(deparse(substitute(min_voi)), "~", deparse(substitute(amoa_oi))))
+  this_formula <- as.formula(paste(deparse(substitute(y_voi)), "~", deparse(substitute(qpcr_oi))))
   this_model <- lm(this_formula, data = mineralization_and_qpcr_data)
   r_squared <- summary(this_model)$r.squared %>%
     round(., 3)
@@ -29,8 +29,8 @@ plot_amoa_min_scatter <- function(amoa_oi, min_voi, foi, palette, show_legend = 
 
   # Get Pearson's R and significance
   this_cor <- cor.test(
-    mineralization_and_qpcr_data %>% pull({{ amoa_oi }}),
-    mineralization_and_qpcr_data %>% pull({{ min_voi }})
+    mineralization_and_qpcr_data %>% pull({{ qpcr_oi }}),
+    mineralization_and_qpcr_data %>% pull({{ y_voi }})
   )
   pearson_r <- this_cor$estimate %>%
     round(., 3)
@@ -39,7 +39,7 @@ plot_amoa_min_scatter <- function(amoa_oi, min_voi, foi, palette, show_legend = 
 
   # Plotting
   p <- mineralization_and_qpcr_data %>%
-    ggplot(aes({{ amoa_oi }}, {{ min_voi }}, fill = {{ foi }}, shape = {{ foi }})) +
+    ggplot(aes({{ qpcr_oi }}, {{ y_voi }}, fill = {{ foi }}, shape = {{ foi }})) +
     geom_hline(yintercept = 0, linetype = "dashed", color = "#848884") +
     geom_point(size = 4) +
     scale_fill_manual(values = palette) +
@@ -55,8 +55,6 @@ plot_amoa_min_scatter <- function(amoa_oi, min_voi, foi, palette, show_legend = 
     ) +
     theme(
       panel.border = element_rect(color = "black", fill = NA),
-      plot.title = element_markdown(hjust = 0.5),
-      plot.subtitle = element_text(hjust = 0.5),
       aspect.ratio = 1,
       axis.title.y = element_markdown()
     ) +
@@ -72,7 +70,17 @@ plot_amoa_min_scatter <- function(amoa_oi, min_voi, foi, palette, show_legend = 
   return(p)
 }
 
+plot_qpcr_n_scatter(ave_norB, net_nitr_rate_abs, Crop, crop_colors) +
+  labs(
+    y = paste(flux_units, per_day_unit),
+    title = "Net mineralization rate (rel.)"
+  )
 
+n2o_data <- read.csv("data/prepped_data/n2o_data.csv")
+tgas <- read.csv("data/chemical/tgas1.csv")
+n2o <- read.csv("data/chemical/N2O.csv")
+
+n2o %>% count(event, rep)
 ############### amoa_12
 amoa_12_crop_row <- wrap_plots(
   plot_amoa_min_scatter(ave_012, net_min_rate_rel, Crop, crop_colors) +
